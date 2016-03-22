@@ -42,4 +42,17 @@ public class ValorNumerico<T> {
 	public void setValor(T val){
 		this.valor = val;
 	}
+	public void setNull(){
+		if(valor instanceof Complejo){
+			((Complejo) valor).setNull();
+		}else if(valor instanceof Racional){
+			((Racional) valor).setNull();
+		}else if(valor instanceof BigInteger){
+			valor = (T) new BigInteger("0");
+		}else if(valor instanceof BigDecimal){
+			valor = (T) new BigDecimal("0");
+		}else{
+			valor = (T) new Boolean(false);
+		}
+	}
 }

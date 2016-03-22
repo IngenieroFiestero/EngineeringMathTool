@@ -25,6 +25,15 @@ public class Complejo <T>{
 	public String toString(){
 		return this.real  + " "+ this.imaginario+ "j";
 	}
+	public void setNull(){
+		if(real instanceof BigInteger){
+			real = (T) new BigInteger("0");
+			imaginario = (T) new BigInteger("0");
+		}else{
+			real = (T) new BigDecimal("0");
+			imaginario = (T) new BigDecimal("0");
+		}
+	}
 	
 	public static boolean equals(Complejo comp1,Complejo comp2){
 		//Solo soportamos BigDecmal y BigInteger

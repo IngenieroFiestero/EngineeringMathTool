@@ -22,6 +22,15 @@ public class Racional <T>{
 	public String toString(){
 		return this.numerador  + "/"+ this.denominador;
 	}
+	public void setNull(){
+		if(numerador instanceof BigInteger){
+			numerador = (T) new BigInteger("0");
+			denominador = (T) new BigInteger("1");
+		}else{
+			numerador = (T) new BigDecimal("0");
+			denominador = (T) new BigDecimal("1");
+		}
+	}
 	public static boolean equals(Racional comp1,Racional comp2){
 		//Solo soportamos BigDecmal y BigInteger
 		if(comp1.getNumerador()instanceof BigInteger 

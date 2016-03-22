@@ -2,13 +2,21 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class Test {
-
+	/*
+	 * Sistema de testeo
+	 */
 	public static void main(String[] args) {
 		testBooleanos();
 		testEnteros();
 		testRacional();
 		testReales();
 		testComplejo();
+		Matriz mat = new Matriz(new int[]{2,3});
+		mat.set(new int[]{1,0 }, new ValorNumerico(new BigInteger("2")));
+		System.out.println(mat);
+		mat.setNull();
+		System.out.println(mat);
+		
 	}
 	public static boolean testBooleanos(){
 		Boolean entero = new Boolean(true);
