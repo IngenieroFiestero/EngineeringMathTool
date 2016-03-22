@@ -20,4 +20,7 @@ public class Operando{
 	public void setNull(){
 		matriz.setNull();
 	}
+	public ValorNumerico getDeterminante(){
+		return null;
+	}
 }

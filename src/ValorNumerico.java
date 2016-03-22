@@ -19,6 +19,26 @@ public class ValorNumerico<T> {
 		this.tipo = tipo;
 		this.valor = valor;
 	}
+	public ValorNumerico(int tipo) {
+		this.tipo = tipo;
+		switch(tipo){
+		case TIPO_BOOLEANO : 
+			valor = (T) new Boolean(false);
+			break;
+		case TIPO_ENTERO : 
+			valor = (T) new BigInteger("0");
+			break;
+		case TIPO_RACIONAL : 
+			valor = (T) new Racional(new BigInteger("0"),new BigInteger("0"));
+			break;
+		case TIPO_REAL : 
+			valor = (T) new BigDecimal("0");
+			break;
+		case TIPO_COMPLEJO : 
+			valor = (T) new Racional(new BigDecimal("0"),new BigDecimal("0"));
+			break;
+		}
+	}
 	public ValorNumerico(T valor) {
 		if(valor instanceof Complejo){
 			this.tipo = TIPO_COMPLEJO;
@@ -53,6 +73,14 @@ public class ValorNumerico<T> {
 			valor = (T) new BigDecimal("0");
 		}else{
 			valor = (T) new Boolean(false);
+		}
+	}
+	public static ValorNumerico suma(ValorNumerico val1,ValorNumerico val2){
+		ValorNumerico ret;
+		if(val1.getTipo()> val2.getTipo()){
+			ret = new ValorNumerico());
+		}else{
+			
 		}
 	}
 }
