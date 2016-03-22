@@ -42,7 +42,7 @@ public class Matriz implements InterfazMatriz{
 		}
 		return ret;
 	}
-	public static Matriz sumar(Matriz mat1, Matriz mat2) throws MatrizException{
+	public static Matriz sumar(Matriz mat1, Matriz mat2) throws MatrizException, ValorNumericoException{
 		int[] dim1 = mat1.dimensions();
 		int[] dim2 = mat2.dimensions();
 		Matriz ret = new Matriz(dim1);

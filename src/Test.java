@@ -14,8 +14,16 @@ public class Test {
 		Matriz mat = new Matriz(new int[]{2,3});
 		mat.set(new int[]{1,0 }, new ValorNumerico(new BigInteger("2")));
 		System.out.println(mat);
-		mat.setNull();
-		System.out.println(mat);
+		Matriz mat2 = new Matriz(new int[]{2,3});
+		mat2.set(new int[]{1,1 }, new ValorNumerico(new BigInteger("3")));
+		System.out.println(mat2);
+		try {
+			Matriz mat3 = Matriz.sumar(mat, mat2);
+			System.out.println(mat3);
+		} catch (MatrizException | ValorNumericoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	public static boolean testBooleanos(){
@@ -59,8 +67,8 @@ public class Test {
 	public static boolean testComplejo(){
 		String val1 = "18";
 		String val2 = "12";
-		Complejo complejo = new Complejo(new BigInteger(val1),new BigInteger(val2));
-		ValorNumerico val = new ValorNumerico<Complejo>(new Complejo(new BigInteger(val1),new BigInteger(val2)));
+		Complejo complejo = new Complejo(new BigDecimal(val1),new BigDecimal(val2));
+		ValorNumerico val = new ValorNumerico<Complejo>(new Complejo(new BigDecimal(val1),new BigDecimal(val2)));
 		if(val.getTipo() == ValorNumerico.TIPO_COMPLEJO 
 				&& (Complejo.equals((Complejo)val.getValor(), complejo))){
 			System.out.println("Test Complejos superado");

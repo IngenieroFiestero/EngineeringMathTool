@@ -4,21 +4,21 @@ import java.math.BigInteger;
 /* Es  necesario quesea de tipo T
  * De esta forma podemos tener números complejos enteros y decimales
  */
-public class Complejo <T>{
-	private T real;
-	private T imaginario;
+public class Complejo{
+	private BigDecimal real;
+	private BigDecimal imaginario;
 	
-	public Complejo(T real, T imaginario){
+	public Complejo(BigDecimal real, BigDecimal imaginario){
 		this.real = real;
 		this.imaginario = imaginario;
 	}
-	public T getReal(){
+	public BigDecimal getReal(){
 		return this.real;
 	}
-	public T getImaginario(){
+	public BigDecimal getImaginario(){
 		return this.imaginario;
 	}
-	public void setValor(T real, T imaginario){
+	public void setValor(BigDecimal real, BigDecimal imaginario){
 		this.real = real;
 		this.imaginario = imaginario;
 	}
@@ -26,25 +26,12 @@ public class Complejo <T>{
 		return this.real  + " "+ this.imaginario+ "j";
 	}
 	public void setNull(){
-		if(real instanceof BigInteger){
-			real = (T) new BigInteger("0");
-			imaginario = (T) new BigInteger("0");
-		}else{
-			real = (T) new BigDecimal("0");
-			imaginario = (T) new BigDecimal("0");
-		}
+		real = new BigDecimal("0");
+		imaginario = new BigDecimal("0");
 	}
 	
 	public static boolean equals(Complejo comp1,Complejo comp2){
-		//Solo soportamos BigDecmal y BigInteger
-		if(comp1.getReal()instanceof BigInteger 
-				&& comp2.getReal() instanceof BigInteger 
-				&& (((BigInteger)comp1.getReal()).compareTo((BigInteger)comp2.getReal())==0)
-				&& (((BigInteger)comp1.getImaginario()).compareTo((BigInteger)comp2.getImaginario())==0)){
-			return true;
-		}else if(comp1.getReal()instanceof BigDecimal 
-				&& comp2.getReal() instanceof BigDecimal 
-				&& (((BigDecimal)comp1.getReal()).compareTo((BigDecimal)comp2.getReal())==0)
+		if((((BigDecimal)comp1.getReal()).compareTo((BigDecimal)comp2.getReal())==0)
 				&& (((BigDecimal)comp1.getImaginario()).compareTo((BigDecimal)comp2.getImaginario())==0)){
 			return true;
 		}else{
