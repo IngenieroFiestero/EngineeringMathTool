@@ -1,13 +1,22 @@
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class Racional{
+public class Racional implements Cloneable{
 	private BigInteger numerador;
 	private BigInteger denominador;
 	
 	public Racional(BigInteger numerador, BigInteger denominador){
 		this.numerador = numerador;
 		this.denominador = denominador;
+	}
+	public Object clone(){
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException ex) {
+			System.out.println(" no se puede duplicar");
+		}
+		return obj;
 	}
 	public BigInteger getNumerador(){
 		return this.numerador;

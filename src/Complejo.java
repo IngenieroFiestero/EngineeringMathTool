@@ -4,13 +4,22 @@ import java.math.BigInteger;
 /* Es  necesario quesea de tipo T
  * De esta forma podemos tener números complejos enteros y decimales
  */
-public class Complejo{
+public class Complejo implements Cloneable{
 	private BigDecimal real;
 	private BigDecimal imaginario;
 	
 	public Complejo(BigDecimal real, BigDecimal imaginario){
 		this.real = real;
 		this.imaginario = imaginario;
+	}
+	public Object clone(){
+		Object obj = null;
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException ex) {
+			System.out.println(" no se puede duplicar");
+		}
+		return obj;
 	}
 	public BigDecimal getReal(){
 		return this.real;

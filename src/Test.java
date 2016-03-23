@@ -12,18 +12,35 @@ public class Test {
 		testReales();
 		testComplejo();
 		Matriz mat = new Matriz(new int[]{2,3});
-		mat.set(new int[]{1,0 }, new ValorNumerico(new BigInteger("2")));
+		mat.set(new int[]{1,1 }, new ValorNumerico(new BigInteger("2")));
 		System.out.println(mat);
-		Matriz mat2 = new Matriz(new int[]{2,3});
+		Matriz mat2 = new Matriz(new int[]{3,3});
 		mat2.set(new int[]{1,1 }, new ValorNumerico(new BigInteger("3")));
 		System.out.println(mat2);
 		try {
-			Matriz mat3 = Matriz.sumar(mat, mat2);
+			Matriz mat3 = Matriz.multiplicar(mat, mat2);
 			System.out.println(mat3);
 		} catch (MatrizException | ValorNumericoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		mat = new Matriz(new int[]{4,4});
+		
+		mat.setRand();
+		Matriz mat3 = (Matriz) mat.clone();//No clona
+		mat.set(new int[]{1,0 }, new ValorNumerico(new Complejo(new BigDecimal("2"),new BigDecimal("5"))));
+		System.out.println(mat3);
+		System.out.println(mat);
+		try {
+			System.out.println(Matriz.sumar(mat, mat3));
+		} catch (MatrizException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ValorNumericoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 	public static boolean testBooleanos(){

@@ -42,7 +42,7 @@ public class ValorNumericoCast {
 		} else if (entero.intValue() == 0) {
 			return new Boolean(false);
 		} else {
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_ENTERO,ValorNumerico.TIPO_BOOLEANO}));
 		}
 	}
 
@@ -66,23 +66,23 @@ public class ValorNumericoCast {
 			}else if(((BigInteger)racional.getNumerador()).intValue()==0){
 				return new Boolean(false);
 			}else{
-				throw new ValorNumericoException("");
+				throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_RACIONAL,ValorNumerico.TIPO_BOOLEANO}));
 			}
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_RACIONAL,ValorNumerico.TIPO_BOOLEANO}));
 		}
 	}
 	public static BigInteger racional2Entero(Racional racional) throws ValorNumericoException{
 		if(((BigInteger)racional.getDenominador()).intValue()==1){
 			return (BigInteger)racional.getNumerador();
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_RACIONAL,ValorNumerico.TIPO_ENTERO}));
 		}
 	}
-	public static BigDecimal racional2Real(Racional racional) throws ValorNumericoException{
+	public static BigDecimal racional2Real(Racional racional){
 		return (new BigDecimal((BigInteger)racional.getNumerador()).divide(new BigDecimal((BigInteger)racional.getDenominador())));
 	}
-	public static Complejo racional2Complejo(Racional racional) throws ValorNumericoException{
+	public static Complejo racional2Complejo(Racional racional){
 		return new Complejo(new BigDecimal((BigInteger)racional.getNumerador()).divide(new BigDecimal((BigInteger)racional.getDenominador())),new BigDecimal("0"));
 	}
 	//Reales
@@ -92,7 +92,7 @@ public class ValorNumericoCast {
 		}else if((real).intValue()==1){
 			return new Boolean(true);
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_REAL,ValorNumerico.TIPO_BOOLEANO}));
 		}
 	}
 	public static BigInteger real2Entero(BigDecimal real)throws ValorNumericoException{
@@ -113,31 +113,31 @@ public class ValorNumericoCast {
 			}else if(((BigDecimal)complejo.getReal()).intValue()==0){
 				return new Boolean(false);
 			}else{
-				throw new ValorNumericoException("");
+				throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_COMPLEJO,ValorNumerico.TIPO_COMPLEJO}));
 			}
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_COMPLEJO,ValorNumerico.TIPO_COMPLEJO}));
 		}
 	}
 	public static BigInteger complejo2Entero(Complejo complejo) throws ValorNumericoException{
 		if(((BigDecimal)complejo.getImaginario()).intValue()==0){
 			return ((BigDecimal)complejo.getReal()).toBigIntegerExact();
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_COMPLEJO,ValorNumerico.TIPO_ENTERO}));
 		}
 	}
 	public static Racional complejo2Racional(Complejo complejo) throws ValorNumericoException{
 		if(((BigDecimal)complejo.getImaginario()).intValue()==0){
 			return new Racional(complejo.getReal().toBigIntegerExact(),new BigInteger("0"));
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_COMPLEJO,ValorNumerico.TIPO_RACIONAL}));
 		}
 	}
 	public static BigDecimal complejo2Real(Complejo complejo) throws ValorNumericoException{
 		if(((BigDecimal)complejo.getImaginario()).intValue()==0){
 			return complejo.getReal();
 		}else{
-			throw new ValorNumericoException("");
+			throw new ValorNumericoException(ValorNumericoException.generarErrorCasteo(new int[]{ValorNumerico.TIPO_COMPLEJO,ValorNumerico.TIPO_REAL}));
 		}
 	}
 	
