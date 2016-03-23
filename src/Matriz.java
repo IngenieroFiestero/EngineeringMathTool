@@ -1,9 +1,9 @@
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.math.BigDecimal;
 
 public class Matriz implements InterfazMatriz, Cloneable {
 	public static final int TIPO = 1;
+	@SuppressWarnings("rawtypes")
 	ValorNumerico[][] matriz;
 
 	public Matriz(int[] length) {
@@ -12,6 +12,7 @@ public class Matriz implements InterfazMatriz, Cloneable {
 	}
 
 	//Implementacion de clone
+	@SuppressWarnings("rawtypes")
 	public Object clone(){
 		Matriz obj = new Matriz(new int[]{this.matriz.length,this.matriz[0].length});
 		for (int i = 0; i < matriz.length; i++) {
@@ -22,10 +23,11 @@ public class Matriz implements InterfazMatriz, Cloneable {
 		return (Object)obj;
 	}
 
-	public void set(int[] i, ValorNumerico val) {
+	public void set(int[] i, @SuppressWarnings("rawtypes") ValorNumerico val) {
 		matriz[i[0]][i[1]] = val;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public ValorNumerico get(int[] i) {
 		return matriz[i[0]][i[1]];
 	}
@@ -34,6 +36,7 @@ public class Matriz implements InterfazMatriz, Cloneable {
 		return new int[] { matriz.length, matriz[0].length };
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void init() {
 		for (int i = 0; i < matriz.length; i++) {
 			for (int j = 0; j < matriz[0].length; j++) {
@@ -82,14 +85,32 @@ public class Matriz implements InterfazMatriz, Cloneable {
 			}
 			return ret;
 		} else {
-			throw new MatrizException(MatrizException.generateErrorDimensions(concat(dim1,dim2)));
+			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
 	}
-	public static Matriz multiplicar(Matriz mat1, Matriz mat2) throws MatrizException, ValorNumericoException {
+	public static Matriz multiplicarP2P(Matriz mat1, Matriz mat2) throws MatrizException, ValorNumericoException {
 		int[] dim1 = mat1.dimensions();
 		int[] dim2 = mat2.dimensions();
 		Matriz ret = new Matriz(dim1);
+		if (Arrays.equals(dim1, dim2)) {
+			for (int i = 0; i < dim1[0]; i++) {
+				for (int j = 0; j < dim1[1]; j++) {
+					ret.set(new int[] { i, j },
+							ValorNumerico.multiplicar(mat1.get(new int[] { i, j }), mat2.get(new int[] { i, j })));
+				}
+			}
+			return ret;
+		} else {
+			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static Matriz multiplicar(Matriz mat1, Matriz mat2) throws MatrizException, ValorNumericoException {
+		int[] dim1 = mat1.dimensions();
+		int[] dim2 = mat2.dimensions();
 		if (dim1[1] == dim2[0]) {
+			Matriz ret = new Matriz(dim1);
 			for (int i = 0; i < dim1[0]; i++) {
 				for (int j = 0; j < dim1[1]; j++) {
 					ValorNumerico val = new ValorNumerico(ValorNumerico.TIPO_ENTERO);
@@ -100,20 +121,27 @@ public class Matriz implements InterfazMatriz, Cloneable {
 				}
 			}
 			return ret;
-		} else {
-			throw new MatrizException(MatrizException.generateErrorDimensions(concat(dim1,dim2)));
+		}else if(dim1[0] == 1 && dim1[1] == 1){
+			//Caso de una sola dimension
+			Matriz ret = new Matriz(dim2);
+			for (int i = 0; i < dim1[0]; i++) {
+				for (int j = 0; j < dim1[1]; j++) {
+					ret.set(new int[]{i,j},ValorNumerico.multiplicar(mat1.get(new int[]{0,0}), mat2.get(new int[]{i,j})));
+				}
+			}
+			return ret;
+		}else if(dim2[0] == 1 && dim2[1] == 1){
+			//Caso de una sola dimension
+			Matriz ret = new Matriz(dim1);
+			for (int i = 0; i < dim1[0]; i++) {
+				for (int j = 0; j < dim1[1]; j++) {
+					ret.set(new int[]{i,j},ValorNumerico.multiplicar(mat1.get(new int[]{i,j}), mat2.get(new int[]{0,0})));
+				}
+			}
+			return ret;
+		}else {
+			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
-	}
-	public static int[] concat(int[] var1,int[] var2){
-		int[] ret = new int[var1.length + var2.length];
-		int i = 0;
-		for (i = 0; i < var1.length; i++) {
-			ret[i] = var1[i];
-		}
-		for (int j = 0; j < var2.length; j++) {
-			ret[j+i] = var2[j];
-		}
-		return ret;
 	}
 
 }

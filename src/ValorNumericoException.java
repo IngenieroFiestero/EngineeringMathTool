@@ -1,7 +1,7 @@
 import java.util.HashMap;
 
 public class ValorNumericoException extends Exception{
-	public static final String SPLITER = "%$";
+	public static final String SPLITER = "%%";
 	//Este tipo de excepcion empiezan por el 1
 	public static final int TIPO = 1;
 	/**
@@ -9,7 +9,7 @@ public class ValorNumericoException extends Exception{
 	 * 1: Problema de casteo
 	 * 2: Problema al operar
 	 */
-	private static HashMap codigos = defMensajes();
+	private static HashMap<Integer,String> codigos = defMensajes();
 
 	private static final long serialVersionUID = -4757304349982202926L;
 	public ValorNumericoException(String msg,Exception exception){
@@ -45,8 +45,8 @@ public class ValorNumericoException extends Exception{
 		}
 		return ret;
 	}
-	private static HashMap defMensajes(){
-		HashMap map = new HashMap<Integer,String>();
+	private static HashMap<Integer,String> defMensajes(){
+		HashMap<Integer,String> map = new HashMap<Integer,String>();
 		map.put(1, "Cant cast " + SPLITER + " to ");
 		map.put(2, "Cant add " + SPLITER);
 		map.put(3, "Cant multiply " + SPLITER);
