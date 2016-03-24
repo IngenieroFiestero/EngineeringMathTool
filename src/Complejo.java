@@ -38,6 +38,9 @@ public class Complejo implements Cloneable{
 		real = new BigDecimal("0");
 		imaginario = new BigDecimal("0");
 	}
+	public static Complejo conjugado(Complejo comp){
+		return new Complejo(comp.getReal(),comp.getImaginario().multiply(new BigDecimal("-1")));
+	}
 	
 	public static boolean equals(Complejo comp1,Complejo comp2){
 		if((((BigDecimal)comp1.getReal()).compareTo((BigDecimal)comp2.getReal())==0)

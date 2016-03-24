@@ -16,6 +16,13 @@ public interface InterfazMatriz {
 			throw new MatrizException(MatrizException.notImplementedError());
 		}
 	}
+	public static InterfazMatriz invertir(InterfazMatriz mat1) throws MatrizException, ValorNumericoException{
+		if(mat1 instanceof Matriz){
+			return Matriz.invertir((Matriz)mat1);
+		}else{
+			throw new MatrizException(MatrizException.notImplementedError());
+		}
+	}
 	public static InterfazMatriz multiplicacion(InterfazMatriz mat1,InterfazMatriz mat2) throws MatrizException, ValorNumericoException{
 		if(mat1 instanceof Matriz && mat2 instanceof Matriz){
 			return Matriz.multiplicar((Matriz)mat1,(Matriz)mat2);

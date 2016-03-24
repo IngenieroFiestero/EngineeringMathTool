@@ -12,6 +12,7 @@ public class Operando{
 		}else if(matriz instanceof Matriz3D){
 			this.tipo = Matriz3D.TIPO;
 		}
+		this.variable = null;
 	}
 	public Operando(InterfazMatriz matriz, Variable variable){
 		this.matriz = matriz;
@@ -19,8 +20,12 @@ public class Operando{
 	}
 	public void setNull(){
 		matriz.setNull();
+		this.variable = null;
 	}
 	public ValorNumerico getDeterminante(){
 		return null;
+	}
+	public void inverse(){
+		
 	}
 }

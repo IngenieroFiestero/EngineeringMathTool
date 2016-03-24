@@ -51,7 +51,7 @@ public class ValorNumericoCast {
 	}
 
 	public static BigDecimal entero2Real(BigInteger entero) {
-		return new BigDecimal(entero);
+		return (BigDecimal)new BigDecimal(entero);
 	}
 
 	public static Complejo entero2Complejo(BigInteger entero) {
