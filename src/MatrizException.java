@@ -20,6 +20,7 @@ public class MatrizException extends Exception{
 		map.put(1, "Matrix dimensions must agree: [" + SPLITER +"],["+ SPLITER + "]");
 		map.put(2, "Cant add " + SPLITER);
 		map.put(3, "Not Implemented");
+		map.put(4, "Not Square matrix " + SPLITER);
 		return map;
 	}
 	
@@ -27,6 +28,12 @@ public class MatrizException extends Exception{
 		String algo = (String) codigos.get(1);
 		String[] vec = algo.split(SPLITER);
 		String ret = vec[0]+arrayToString(dim1,dim1.length)+vec[1]+arrayToString(dim2,dim2.length)+vec[2];
+		return ret;
+	}
+	public static String generateErrorNotSquareMatrix(int[] dim1){
+		String algo = (String) codigos.get(1);
+		String[] vec = algo.split(SPLITER);
+		String ret = vec[0]+arrayToString(dim1,dim1.length);
 		return ret;
 	}
 	public static String notImplementedError(){

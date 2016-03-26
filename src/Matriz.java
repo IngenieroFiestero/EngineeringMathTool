@@ -67,13 +67,17 @@ public class Matriz implements InterfazMatriz, Cloneable {
 			}
 		}
 	}
+	/**
+	 * Matriz Identidad
+	 * @throws MatrizException
+	 */
 	public void setIdentidad()throws MatrizException{
 		if(matriz.length == matriz[0].length){
 			for (int i = 0; i < matriz.length; i++) {
 				matriz[i][i] = new ValorNumerico(new BigInteger("1"));
 			}
 		}else{
-			throw new MatrizException("problem");
+			throw new MatrizException(MatrizException.generateErrorNotSquareMatrix(this.dimensions()));
 		}
 	}
 

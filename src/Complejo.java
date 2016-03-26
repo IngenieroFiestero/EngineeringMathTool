@@ -32,7 +32,12 @@ public class Complejo implements Cloneable{
 		this.imaginario = imaginario;
 	}
 	public String toString(){
-		return this.real  + " "+ this.imaginario+ "j";
+		if(this.imaginario.compareTo(BigDecimal.ZERO) == 0){
+			return this.real + "";
+		}else{
+			return this.real+ " "+ this.imaginario+ "j";
+		}
+		  
 	}
 	public void setNull(){
 		real = new BigDecimal("0");

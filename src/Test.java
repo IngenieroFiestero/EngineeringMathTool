@@ -45,8 +45,7 @@ public class Test {
 			Matriz matTrans = Matriz.sumar(mat1, mat2);
 			System.out.println(matTrans);
 		} catch (MatrizException | ValorNumericoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println(e);
 		}
 	}
 	public static boolean testMatrizInversa(){
@@ -78,11 +77,11 @@ public class Test {
 				System.out.println("Son iguales");
 				return true;
 			}else{
-				System.out.println("Son diferentes");
+				System.err.println("Son diferentes");
 				return false;
 			}
 		} catch (MatrizException | ValorNumericoException e) {
-			System.out.println(e);
+			System.err.println(e);
 			return false;
 		}
 	}
@@ -94,7 +93,7 @@ public class Test {
 			System.out.println("Test Booleanos superado");
 			return true;
 		}else{
-			System.out.println("Test Booleanos NO superado");
+			System.err.println("Test Booleanos NO superado");
 			return false;
 		}
 	}
@@ -107,7 +106,7 @@ public class Test {
 			System.out.println("Test Enteros superado");
 			return true;
 		}else{
-			System.out.println("Test Enteros NO superado");
+			System.err.println("Test Enteros NO superado");
 			return false;
 		}
 	}
@@ -120,7 +119,7 @@ public class Test {
 			System.out.println("Test Enteros superado");
 			return true;
 		}else{
-			System.out.println("Test Enteros NO superado");
+			System.err.println("Test Enteros NO superado");
 			return false;
 		}
 	}
@@ -134,7 +133,7 @@ public class Test {
 			System.out.println("Test Complejos superado");
 			return true;
 		}else{
-			System.out.println("Test Complejos NO superado");
+			System.err.println("Test Complejos NO superado");
 			return false;
 		}
 	}
@@ -148,7 +147,7 @@ public class Test {
 			System.out.println("Test Racionales superado");
 			return true;
 		}else{
-			System.out.println("Test Racionales NO superado");
+			System.err.println("Test Racionales NO superado");
 			return false;
 		}
 	}
