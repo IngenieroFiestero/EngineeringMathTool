@@ -1,6 +1,7 @@
 # EngineeringMathTool
 A mathematical library written in java
 ## Primera aproximacion sobre la Sintaxis
+La idea es poder permitir sencillez y eliminar la mayor cantidad de parentesis posible para facilitar la visualización del codigo asi como facilitar la escritura. Ej: .3 que es lo mismo que 0.3
 * 7-2(5-6) =>Transformacion => 7-2*(5-6)
 * (3-5)7-(1+2) => Transformacion => (3-5)*7-(2+3)
 * (12-4)y-1 => Transformacion => (12-4)*y - 1
