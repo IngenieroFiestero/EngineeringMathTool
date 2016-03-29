@@ -6,8 +6,9 @@ public class ValorNumericoException extends Exception{
 	public static final int TIPO = 1;
 	/**
 	 * Los posibles codigos de errores son los siguientes:
-	 * 1: Problema de casteo
-	 * 2: Problema al operar
+	 * 1: Problema de division por 0
+	 * 2: Problema de suma
+	 * 3: Problema de multiplicacion
 	 */
 	private static HashMap<Integer,String> codigos = defMensajes();
 
@@ -21,19 +22,11 @@ public class ValorNumericoException extends Exception{
 	public ValorNumericoException(Exception exception){
 		super(exception);
 	}
-	public static String generarErrorCasteo(int[] tipo){
-		String[] vec = ((String) codigos.get(1)).split(SPLITER);
-		String ret = "";
-		for (int i = 0; i < vec.length; i++) {
-			ret = ret + vec[i] + ValorNumerico.nombres[tipo[i]];
-		}
-		return ret;
-	}
 	public static String generarErrorSuma(int[] tipo){
 		String[] vec = ((String) codigos.get(2)).split(SPLITER);
 		String ret = "";
 		for (int i = 0; i < vec.length; i++) {
-			ret = ret + vec[i] + ValorNumerico.nombres[tipo[i]];
+			ret = ret + vec[i];
 		}
 		return ret;
 	}
@@ -41,13 +34,16 @@ public class ValorNumericoException extends Exception{
 		String[] vec = ((String) codigos.get(3)).split(SPLITER);
 		String ret = "";
 		for (int i = 0; i < vec.length; i++) {
-			ret = ret + vec[i] + ValorNumerico.nombres[tipo[i]];
+			ret = ret + vec[i];
 		}
 		return ret;
 	}
+	public static String generarErrorDenominadorNulo(){
+		return (String)codigos.get(1);
+	}
 	private static HashMap<Integer,String> defMensajes(){
 		HashMap<Integer,String> map = new HashMap<Integer,String>();
-		map.put(1, "Cant cast " + SPLITER + " to ");
+		map.put(1, "Cant divide by 0 ");
 		map.put(2, "Cant add " + SPLITER);
 		map.put(3, "Cant multiply " + SPLITER);
 		return map;

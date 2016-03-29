@@ -7,44 +7,23 @@ import java.util.ArrayList;
 public class MathContext implements Serializable{
 	private static final long serialVersionUID = -8069695659613918920L;
 	
-	ArrayList<Variable> variableList = new ArrayList<Variable>();
-	ArrayList<Funcion> funcionList = new ArrayList<Funcion>();
+	private ListaVariables variableList;
+	private ListaFunciones funcionList;
+	
+	public MathContext(){
+		this.variableList = variableList;
+		this.funcionList = funcionList;
+	}
 	/**
 	 * Contexto matematico, contiene las funciones y variables que usará el intérprete para poder
 	 * Dar valores a las expresiones y clasificar las expresiones. Es serializable con lo cual se 
 	 * puede guardar para poder asi trabajar con diferentes espacios de trabajo.
 	 */
-	public MathContext(){
-		
+	public MathContext(ListaVariables variableList,ListaFunciones funcionList){
+		this.variableList = variableList;
+		this.funcionList = funcionList;
 	}
-	/**
-	 * Busca una variable dentro del contexto utilizando para ello un nombre(String)
-	 * @param name Nombre de la variable
-	 * @return Variable
-	 * @throws InterpreteException
-	 */
-	public Variable findVariableByName(String name) throws InterpreteException{
-		for (int i = 0; i < variableList.size(); i++) {
-			if(variableList.get(i).getName().equals(name)){
-				return variableList.get(i);
-			}
-		}
-		throw new InterpreteException(InterpreteException.generateCantFindError(name));
-	}
-	/**
-	 * Busca una funcion dentro del contexto utilizando para ello un nombre(String).
-	 * @param name Nombre de la funcion
-	 * @return Funcion
-	 * @throws InterpreteException
-	 */
-	public Funcion findFuncionByName(String name) throws InterpreteException{
-		for (int i = 0; i < funcionList.size(); i++) {
-			if(funcionList.get(i).getName().equals(name)){
-				return funcionList.get(i);
-			}
-		}
-		throw new InterpreteException(InterpreteException.generateCantFindError(name));
-	}
+	
 	/**
 	 * Lee desde un InputStream un objeto de tipo MathContext
 	 * Utilizamos InputStream para poder utilizar cualquier sistema de lectura, desde un string hasta un socket pasando por el directorio de archivos
@@ -57,6 +36,24 @@ public class MathContext implements Serializable{
 		ObjectInputStream ois = new ObjectInputStream(is);
 		MathContext ret = (MathContext) ois.readObject();
 		return ret;
+	}
+	/**
+	 * Busca una variable dentro del contexto utilizando para ello un nombre(String)
+	 * @param name Nombre de la variable
+	 * @return Variable
+	 * @throws InterpreteException
+	 */
+	public Variable findVariableByName(String name) throws InterpreteException{
+		return variableList.findVariableByName(name);
+	}
+	/**
+	 * Busca una funcion dentro del contexto utilizando para ello un nombre(String).
+	 * @param name Nombre de la funcion
+	 * @return Funcion
+	 * @throws InterpreteException
+	 */
+	public Funcion findFuncionByName(String name) throws InterpreteException{
+		return funcionList.findFuncionByName(name);
 	}
 
 }
