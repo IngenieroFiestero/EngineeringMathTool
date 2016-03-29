@@ -6,6 +6,7 @@ import java.util.Random;
 public class ValorNumerico implements Cloneable {
 	private double real;
 	private double imaginario;
+	private double divisor;
 	public static final String IMAGINARIO = "i";
 	public static final String[] TOKENS = new String[] { " ", "+", "-", "i" };
 	public static final ValorNumerico I = new ValorNumerico(0.0, 1.0);
@@ -23,6 +24,14 @@ public class ValorNumerico implements Cloneable {
 	public ValorNumerico(double real, double imaginario) {
 		this.real = real;
 		this.imaginario = imaginario;
+		this.divisor = 1;
+		isNaN = Double.isNaN(real) || Double.isNaN(imaginario);
+		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
+	}
+	public ValorNumerico(double real, double imaginario,double divisor) {
+		this.real = real;
+		this.imaginario = imaginario;
+		this.divisor = divisor;
 		isNaN = Double.isNaN(real) || Double.isNaN(imaginario);
 		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
 	}
@@ -56,17 +65,28 @@ public class ValorNumerico implements Cloneable {
 		}
 		this.real = real;
 		this.imaginario = imagin;
+		this.divisor = 1;
 		isNaN = Double.isNaN(real) || Double.isNaN(imaginario);
 		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
 	}
 
 	public String toString() {
-		if (this.imaginario == 0) {
-			return this.real + "";
-		} else if (this.real == 0) {
-			return this.imaginario + "i";
-		} else {
-			return this.real + " " + this.imaginario + "i";
+		if(this.divisor == 1){
+			if (this.imaginario == 0) {
+				return this.real + "";
+			} else if (this.real == 0) {
+				return this.imaginario + "i";
+			} else {
+				return this.real + " " + this.imaginario + "i";
+			}
+		}else{
+			if (this.imaginario == 0) {
+				return this.real/this.divisor + "";
+			} else if (this.real == 0) {
+				return this.imaginario/divisor + "i";
+			} else {
+				return this.real/this.divisor + " " + this.imaginario/divisor + "i";
+			}
 		}
 	}
 
@@ -85,21 +105,31 @@ public class ValorNumerico implements Cloneable {
 	public boolean isNaN() {
 		return this.isNaN;
 	}
+	public double getDivisor(){
+		return this.divisor;
+	}
 
 	public ValorNumerico add(ValorNumerico val) {
 		if (isNaN || val.isNaN()) {
 			return NaN;
 		} else {
-			return new ValorNumerico(this.real + val.getReal(), this.imaginario + val.getImaginario());
+			if(divisor == 1 && val.getDivisor() == 1){
+				return new ValorNumerico(this.real + val.getReal(), this.imaginario + val.getImaginario(),this.divisor);
+			}else{
+				return new ValorNumerico(this.real + val.getReal(), this.imaginario + val.getImaginario(),this.divisor);
+			}
 		}
-
 	}
 
 	public ValorNumerico substract(ValorNumerico val) {
 		if (isNaN || val.isNaN()) {
 			return NaN;
 		} else {
-			return new ValorNumerico(this.real - val.getReal(), this.imaginario - val.getImaginario());
+			if(divisor == 1 && val.getDivisor() == 1){
+				return new ValorNumerico(this.real - val.getReal(), this.imaginario + val.getImaginario(),this.divisor);
+			}else{
+				return new ValorNumerico(this.real*val.getDivisor() - val.getReal()*this.divisor, this.imaginario*val.getDivisor() - val.getImaginario()*this.divisor,this.divisor*val.divisor);
+			}
 		}
 	}
 
@@ -107,8 +137,7 @@ public class ValorNumerico implements Cloneable {
 		if (isNaN) {
 			return NaN;
 		}
-
-		return new ValorNumerico(this.real, -this.imaginario);
+		return new ValorNumerico(this.real, -this.imaginario,this.divisor);
 	}
 
 	public ValorNumerico divide(ValorNumerico divisor) throws ValorNumericoException {
@@ -116,25 +145,40 @@ public class ValorNumerico implements Cloneable {
 		if (isNaN || divisor.isNaN) {
 			return NaN;
 		}
-		final double c = divisor.getReal();
-		final double d = divisor.getImaginario();
-		if (c == 0.0 && d == 0.0) {
-			return NaN;
-		}
+		if(this.divisor == 1 && divisor.getDivisor() == 1){
+			final double c = divisor.getReal();
+			final double d = divisor.getImaginario();
+			if (c == 0.0 && d == 0.0) {
+				return NaN;
+			}
 
-		if (divisor.isInfinite() && !isInfinite()) {
-			return ZERO;
-		}
+			if (divisor.isInfinite() && !isInfinite()) {
+				return ZERO;
+			}
+			if (c == 0.0 && d == 0.0) {
+				return NaN;
+			}
+			if (divisor.isInfinite() && !isInfinite()) {
+				return ZERO;
+			}
+			return new ValorNumerico((this.real*divisor.getReal()-this.imaginario*divisor.getImaginario()),
+					(this.real*divisor.getImaginario()+this.imaginario*divisor.getReal()),
+					(divisor.getReal()*divisor.getReal()+divisor.getImaginario()*divisor.getImaginario()));
 
-		if (Math.abs(c) < Math.abs(d)) {
-			double q = c / d;
-			double denominador = c * q + d;
-			return new ValorNumerico((real * q + imaginario) / denominador, (imaginario * q - real) / denominador);
-		} else {
-			double q = d / c;
-			double denominador = d * q + c;
-			return new ValorNumerico((imaginario * q + real) / denominador, (imaginario - real * q) / denominador);
+		}else{
+			final double c = divisor.getReal()*this.getDivisor();
+			final double d = divisor.getImaginario()*this.getDivisor();
+			if (c == 0.0 && d == 0.0) {
+				return NaN;
+			}
+			if (divisor.isInfinite() && !isInfinite()) {
+				return ZERO;
+			}
+			return new ValorNumerico(divisor.getDivisor()*(this.real*divisor.getReal()-this.imaginario*divisor.getImaginario()),
+					divisor.getDivisor()*(this.real*divisor.getImaginario()+this.imaginario*divisor.getReal()),
+					this.divisor*(divisor.getReal()*divisor.getReal()+divisor.getImaginario()*divisor.getImaginario()));
 		}
+		
 	}
 
 	@Override
@@ -148,7 +192,8 @@ public class ValorNumerico implements Cloneable {
 				return isNaN;
 			} else {
 				return new Double(real).equals(new Double(c.getReal()))
-						&& new Double(imaginario).equals(new Double(c.getImaginario()));
+						&& new Double(imaginario).equals(new Double(c.getImaginario()))
+						&& new Double(divisor).equals(new Double(c.getDivisor()));
 			}
 		}
 		return false;
@@ -164,7 +209,8 @@ public class ValorNumerico implements Cloneable {
 			return INF;
 		}
 		return new ValorNumerico(real * factor.real - imaginario * factor.imaginario,
-				real * factor.imaginario + imaginario * factor.real);
+				real * factor.imaginario + imaginario * factor.real,
+				divisor*factor.divisor);
 	}
 	public Object clone(){
 		return new ValorNumerico(this.real,this.imaginario);
@@ -243,6 +289,25 @@ public class ValorNumerico implements Cloneable {
 		}
 
 		return ret;
+	}
+	/**
+	 * Utilidad para trabajar con divisores, puesto que una de las variables que se guardan son los divisores
+	 * @param num
+	 * @return
+	 */
+	public static long[] divisores(double num){
+		ArrayList<Long> lista = new ArrayList<Long>();
+		long i;
+        for (i = 2; i <= num / 2; i++) {
+            if (num % i == 0) {
+                lista.add(i);
+            }
+        }
+        long[] list = new long[lista.size()];
+        for (int j = 0; j < list.length; j++) {
+			list[j] = lista.get(j);
+		}
+        return list;
 	}
 
 	public static void checkNotNull(ValorNumerico val) throws ValorNumericoException {

@@ -114,7 +114,7 @@ public class MathInterprete {
 		String[] tokens = txt.split(" ");
 		if (tokens[0].equals(MathToken.FUNCION)) {
 			return TIPO.FUNCION;
-		} else if (tokens[1].equals(MathToken.ASIGNACION)) {
+		} else if (tokens[0].equals(MathToken.ASIGNACION)) {
 			return TIPO.ASIGNACION;
 		} else if (txt.contains(MathToken.ASIGNACION)) {
 			return TIPO.EXPRESION;
