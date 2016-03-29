@@ -44,8 +44,16 @@ sin,cos,tan,asin,acos,atan,sinh,cosh,tanh,asinh,acosh,atanh,
 log,ln,e,pi,abs,i,j,!,+,-,*,^,/,%,.*,./,.%,.^,.!,(,),[,],{,},det,conj,.conj,ºr,ºg,ºd
 ```
 
+### Trabajar con angulos
 Las palabras clave ºr,ºg,ºd son para trabajar con angulos. De forma que 2ºr (2*pi Radianes)= 360ºd (360 Grados)= 400ºg (1 Gradian).
 De esta forma son operadores unitarios para conversion de unidades angulares convirtiendo las unidades "double" de la siguiente forma: -1=-180ºd,1=180ºd.
+```
+Trabajar con angulos se vuelve mucho más sencillo:
+360ºd se transforman en un double de valor 0.
+90ºd se transformarian en un double de valor 0.5.
+0.5ºr es un valor de 0.5. Realmente no tiene mucho uso salvo para aclaraciones a la hora de leer el codigo.
+Asi si hiciesemos sin(90ºd) obtendriamos un bonito 0 y sin complicarnos la vida haciendo conversiones con una calculadora a radianes.
+```
 
 Los nombres de clases e interfaces estaran en Español o Spanglish para evitar usar nombres de clases ya existentes.
 Estoy todavia rehaciendo la clase ValorNumerico que pasará a trabajar directamente con complejos y no a ser un contenedor de otros números.
