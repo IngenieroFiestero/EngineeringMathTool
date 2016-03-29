@@ -1,5 +1,19 @@
 # EngineeringMathTool
 A mathematical library written in java
+## Primera aproximacion sobre la Sintaxis
+* 7-2(5-6) =>Transformacion => 7-2*(5-6)
+* (3-5)7-(1+2) => Transformacion => (3-5)*7-(2+3)
+* (12-4)y-1 => Transformacion => (12-4)*y - 1
+* 3x+1 => Transformacion => 3*x + 1
+* x21+4 : Si x21 is variable? sino lo es Se lanza error de variable x21 no encontrada
+* (4-5)(2 * x) => Transformacion => (4-5) * (2*x)
+* (-.3 + 7) => Transformacion => (-0.3 + 7)
+* 3 * (.5+4) => Transformacion => 3 * (0.5+4)
+* (4+5).7-2 => Transformacion =>  (4+5)*0.7 -2
+* 5 .* 9+1 => Valido Puesto que " .* " es una operacion de multiplicación punto por punto para vectores. Ej: [2,3].*[2,3]=[4,9]
+* (3+2.)*5 => Transformacion => (3+2)*5
+* '3'*2 => ValorAscii(3) * 2
+* 1^2 +2^2 +3^2 => Transformacion siempre que haya espacios en blanco=> 1^(2)+2^(2)+3^(2)
 
 Los nombres de clases e interfaces estaran en Español o Spanglish para evitar usar nombres de clases ya existentes.
 Estoy todavia rehaciendo la clase ValorNumerico que pasará a trabajar directamente con complejos y no a ser un contenedor de otros números.
