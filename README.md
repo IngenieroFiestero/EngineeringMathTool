@@ -16,6 +16,21 @@ La idea es poder permitir sencillez y eliminar la mayor cantidad de parentesis p
 * '3'*2 => ValorAscii(3) * 2
 * 1^2 +2^2 +3^2 => Transformacion siempre que haya espacios en blanco=> 1^(2)+2^(2)+3^(2)
 
+## Creacion de Funciones
+Será posible definir funciones de la forma:
+
+```
+miFuncion1(x,y)=sqrt(x^2 + y^2);
+```
+Para funciones más complejas que necesitan un uso de multilinea:
+```
+miFuncion1(x,y)={
+  a=x^2;
+  b=y^2;
+  return sqrt(a+b);
+}
+```
+
 Los nombres de clases e interfaces estaran en Español o Spanglish para evitar usar nombres de clases ya existentes.
 Estoy todavia rehaciendo la clase ValorNumerico que pasará a trabajar directamente con complejos y no a ser un contenedor de otros números.
 La libreria Trabajara directamente consigomisma para los calculos sencillos y para los más complejos se utilizara la libreria common-math de apache que por lo que he visto parece muy avanzada y sigue siendo actualizada.
