@@ -32,8 +32,10 @@ miFuncion1(x,y)={
 ```
 ## Lista Nombres Reservados
 Estos nombres equivalen a funciones y operadores.
-sin,cos,tan,asin,acos,atan,sinh,cosh,tanh,asinh,acosh,atanh,log,ln,e,pi,abs,i,j,!,+,-,*,^,/,%,.*,./,.%,.^,.!,(,),[,],{,},det,conj,.conj
-
+```
+sin,cos,tan,asin,acos,atan,sinh,cosh,tanh,asinh,acosh,atanh,
+log,ln,e,pi,abs,i,j,!,+,-,*,^,/,%,.*,./,.%,.^,.!,(,),[,],{,},det,conj,.conj
+```
 
 Los nombres de clases e interfaces estaran en Español o Spanglish para evitar usar nombres de clases ya existentes.
 Estoy todavia rehaciendo la clase ValorNumerico que pasará a trabajar directamente con complejos y no a ser un contenedor de otros números.
