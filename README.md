@@ -1,5 +1,12 @@
 # EngineeringMathTool
 A mathematical library written in java
+La libreria ahora permite trabajar directamente con complejos y usando la clase ValorNumerico. Aunque esta trabaja con double y no con BigDecimal, permite el uso de una tercera variable llamada divisor (un denominador de tipo real) que hace que las divisiones se conviertan únicamente en mutiplicaciones y que lo que realmente divide se valla almacenando mostrandose únicamente una vez que ya hemos finalizado el trabajo con dicha variable y llamamos a toString(). Un ejemplo de su funcionamiento:
+```
+4.0 -2.5i / 6.0i
+Numerador = 15.0 24.0i ,divisor:36.0
+0.4166666666666667 0.6666666666666666i
+```
+
 ## Primera aproximacion sobre la Sintaxis
 La idea es poder permitir sencillez y eliminar la mayor cantidad de parentesis posible para facilitar la visualización del codigo asi como facilitar la escritura. Ej: .3 que es lo mismo que 0.3
 * 7-2(5-6) =>Transformacion => 7-2*(5-6)
