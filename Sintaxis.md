@@ -25,7 +25,11 @@ Esta limitación se resolvera con el archivo ".includes" y una carpeta donde car
 
 ## Matrices
 Las matrices ocupan una posición muy importante, pues practicamente todas las carreras de ingenieria las usan. Desde circuitos lógicos hasta tratamiento digital de señal.
-Se permitiran operaciones como +,-,*,/,%,!,.*,./,.%,.!... El simbolo "!" es el de factorial (Solo permitido si es entero) y las operaciones con un punto ".*" denotan 
+Se permitiran operaciones como 
+```
++,-, * , / , % , ! ,.* ,./,.%,.!... 
+```
+El simbolo "!" es el de factorial (Solo permitido si es entero) y las operaciones con un punto ".*" denotan 
 operación punto por punto en las que las operaciones se realizan elemento a elemento.
 * " * ": [1,2] * [2,3;2,3]=[6,9]
 * ". * ":[1,2].* [2,3]=[2,6]
