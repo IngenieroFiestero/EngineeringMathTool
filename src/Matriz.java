@@ -9,26 +9,46 @@ public class Matriz implements  Cloneable {
 		matriz = new ValorNumerico[length[0]][length[1]];
 		init();
 	}
-	public Matriz(String txt) {
+	public Matriz(String txt) throws MatrizException{
 		int columnas = 0;
-		int filas = 0;
+		int filas = 1;
 		int lastPos = 0;//Indica la posicion del anterior separador
+		int columnaActual=0;
 		ArrayList<String> valores = new ArrayList<String>();
 		for (int i = 0; i < txt.length(); i++) {
-			if(txt.charAt(i) == MathToken.MATRIX_COLUMNA_SEPARATOR_1.charAt(0)){
-				valores.add(txt.substring(lastPos+1, i-1));
-				lastPos = i;
-				columnas++;
+			if(txt.charAt(i) == MathToken.MATRIX_COLUMNA_SEPARATOR.charAt(0)){
+				valores.add(txt.substring(lastPos, i));
+				lastPos = i+1;
+				if(filas == 1){
+					columnas++;
+				}
+				columnaActual++;
 			}else if(txt.charAt(i) == MathToken.MATRIX_FILA_SEPARATOR.charAt(0)){
-				valores.add(txt.substring(lastPos+1, i-1));
-				lastPos = i;
+				valores.add(txt.substring(lastPos, i));
+				if(filas == 1){
+					columnas++;
+				}
+				/* Si en algun momento habiendo mas de una fila, vamos a
+				 *  cambiar de fila y hay más columnas de las que deberia o menos
+				 *  tiramos error
+				 */
+				if(filas > 1 && columnaActual != columnas-1){
+					throw new MatrizException("error");
+				}
+				lastPos = i+1;
 				filas++;
+				columnaActual=0;
+			}else if(i == txt.length()-1){
+				valores.add(txt.substring(lastPos, txt.length()));
+				if(filas == 1){
+					columnas++;
+				}
 			}
 		}
 		matriz = new ValorNumerico[filas][columnas];
 		for (int i = 0; i < matriz.length; i++) {
 			for (int j = 0; j < matriz[0].length; j++) {
-				matriz[i][j] = new ValorNumerico(valores.get(i+j));
+				matriz[i][j] = new ValorNumerico(valores.get(i*columnas+j));
 			}
 		}
 	}
@@ -109,12 +129,30 @@ public class Matriz implements  Cloneable {
 	}
 
 	public String toString() {
-		String ret = "";
-		for (int i = 0; i < matriz.length; i++) {
-			for (int j = 0; j < matriz[0].length; j++) {
-				ret = ret + " " + matriz[i][j];
+		String ret = "[";
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length - 1; j++) {
+				ret = ret + matriz[i][j]+ ", ";
 			}
-			ret = ret + "\n";
+			if(i == matriz.length-1){
+				ret=ret + matriz[i][matriz[0].length-1]+ "]";
+			}else{
+				ret = ret + matriz[i][matriz[0].length-1]+ "\n";
+			}
+		}
+		return ret;
+	}
+	public String toStringInLine() {
+		String ret = "[";
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length - 1; j++) {
+				ret = ret + matriz[i][j]+ ", ";
+			}
+			if(i == matriz.length-1){
+				ret=ret + matriz[i][matriz[0].length-1]+ "]";
+			}else{
+				ret = ret + matriz[i][matriz[0].length-1]+ ";";
+			}
 		}
 		return ret;
 	}
@@ -133,54 +171,50 @@ public class Matriz implements  Cloneable {
 			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
 	}
-	/*
 	public Matriz invertir() throws MatrizException, ValorNumericoException{
 		int[] dim1 = this.dimensions();
 		Matriz ret = new Matriz(dim1);
+		Matriz aux = (Matriz) this.clone();
 		if (dim1[0] == 1 && dim1[1] == 1) {
 			//Si es solo un elemento se calcula 1/elemento
-			this.matriz[0][0] = new ValorNumerico(1,0).divide(matriz[0][0]);
-			return this;
+			ret.set(new int[]{0,0},new ValorNumerico(1,0).divide(matriz[0][0]));
+			return ret;
 		}else if(dim1[0] == dim1[1]){
 			ret.setIdentidad();
 			//Si es cuadrada y mas de dimension 1,1
-			ValorNumerico val = (ValorNumerico)aux.get(new int[]{0,0}).clone();
-			if(val.equals(new ValorNumerico(new BigInteger("1")))){
-			}else{
-				aux.set(new int[]{0,0}, new ValorNumerico(new BigInteger("1")));
-				ret.set(new int[]{0,0},ValorNumerico.dividir((ValorNumerico) ret.get(new int[]{0,0}).clone(), val));
+			ValorNumerico val = matriz[0][0];
+			if(!val.equals(ValorNumerico.ONE)){
+				aux.set(new int[]{0,0}, new ValorNumerico(1,0));
+				ret.set(new int[]{0,0}, ret.get(new int[]{0,0}).divide(val));
 				for (int j = 1; j < dim1[1]; j++) {
 					int[] pos = new int[]{0, j};
-					aux.set(pos,ValorNumerico.dividir((ValorNumerico) aux.get(pos).clone(), val));
-					ret.set(pos,ValorNumerico.dividir((ValorNumerico) ret.get(pos).clone(), val));
+					aux.set(pos,aux.get(pos).divide(val));
+					ret.set(pos,ret.get(pos).divide(val));
 				}
 			}
 			//Operar
-			//i comulnas,j filas,k columnas
+			//i columnas,j filas,k columnas
 			for (int i = 0; i < dim1[0]; i++) {
 				for (int j = 0; j < dim1[1]; j++) {
 					//Se empieza primero por los elementos de las columnas
-					ValorNumerico multi = ValorNumerico.dividir((ValorNumerico)aux.get(new int[]{j,i}).clone(), (ValorNumerico)aux.get(new int[]{i,i}).clone());
-					if(i!= j && !multi.equals(new ValorNumerico(new BigInteger("0")))){
+					ValorNumerico multi = aux.get(new int[]{j,i}).divide(aux.get(new int[]{i,i}));
+					if(i!= j && !multi.equals(ValorNumerico.ZERO)){
 						//Si un elemento que no es de la diagonal principal es distinto de 0 se resta a toda la fila
 						for (int k = 0; k < dim1[1]; k++) {
-							//System.out.println(aux.get(new int[]{j,k}).getValor());
-							//System.out.println(ret.get(new int[]{j,k}).getValor());
-							aux.set(new int[]{j,k}, ValorNumerico.resta(aux.get(new int[]{j,k}), 
-									ValorNumerico.multiplicar(multi, aux.get(new int[]{i,k}))));
-							ret.set(new int[]{j,k}, ValorNumerico.resta(ret.get(new int[]{j,k}), 
-									ValorNumerico.multiplicar(multi, ret.get(new int[]{i,k}))));
+							int[] pos = new int[]{j,k};
+							aux.set(pos, aux.get(pos).substract(multi.multiply(aux.get(new int[]{j,k}))));
+							ret.set(pos, ret.get(pos).substract(multi.multiply(ret.get(new int[]{j,k}))));
 						}
 					}
 				}
 			}
 			for (int i = 1; i < dim1[1]; i++) {
 				ValorNumerico val2 = (ValorNumerico)aux.get(new int[]{i,i}).clone();
-				if(!val2.equals(new ValorNumerico(new BigDecimal("1")))){
+				if(!val2.equals(ValorNumerico.ONE)){
 					for (int j = 0; j < dim1[0]; j++) {
 						int[] pos = new int[]{i, j};
-						aux.set(pos,ValorNumerico.dividir(aux.get(pos), val2));
-						ret.set(pos,ValorNumerico.dividir(ret.get(pos), val2));
+						aux.set(pos, aux.get(pos).divide(val2));
+						ret.set(pos, ret.get(pos).divide(val2));
 					}
 				}
 			}
@@ -188,7 +222,7 @@ public class Matriz implements  Cloneable {
 		} else {
 			throw new MatrizException(MatrizException.generateErrorDimensions(new int[]{dim1[0]},new int[]{dim1[1]}));
 		}
-	}*/
+	}
 	public Matriz multiplicarP2P(Matriz mat) throws MatrizException, ValorNumericoException {
 		int[] dim1 = this.dimensions();
 		int[] dim2 = mat.dimensions();

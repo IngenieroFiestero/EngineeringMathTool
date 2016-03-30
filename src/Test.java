@@ -20,6 +20,17 @@ public class Test {
 		} catch (ValorNumericoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}try{
+			Matriz mat = new Matriz("1,2,3");
+			System.out.println(mat.toString());
+			mat = new Matriz("1,2,3;4,5,2 - 6i");
+			System.out.println(mat.toString());
+			System.out.println(mat.toStringInLine());
+			Matriz mat2 = new Matriz("1,2,3;4,5,2");
+			Matriz res = mat2.sumar(mat);
+			System.out.println(res);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 

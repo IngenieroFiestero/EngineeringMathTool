@@ -43,18 +43,15 @@ public class MathInterprete {
 	}
 
 	private String evaluacion(String txt) {
+		String ret="";
 		try {
 			int[][] pos = findMatriz(txt);
 			for (int i = 0; i < pos.length; i++) {
 				Matriz mat = new Matriz(txt.substring(pos[0][i], pos[1][i]));
-				System.out.println(mat);
 			}
 		} catch (InterpreteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return "";
+		}catch (MatrizException me) {}
+		return ret;
 	}
 
 	public static int[][] findMatriz(String txt) throws InterpreteException {
