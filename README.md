@@ -56,8 +56,8 @@ Trabajar con angulos se vuelve mucho más sencillo:
 Asi si hiciesemos sin(90ºd) obtendriamos un bonito 0 y sin complicarnos la vida haciendo conversiones con una calculadora a radianes.
 ```
 
-### Trabajo con Funciones
-Para trabajr con funciones se utilizarán los símbolos "[" y "]". Asi para crear una matriz en cualquier punto:
+### Trabajo con Matrices
+Para trabajr con matrices se utilizarán los símbolos "[" y "]". Asi para crear una matriz en cualquier punto:
 ```
 [1,2,3;4,5,6;7,8,9]
 Crearia:
