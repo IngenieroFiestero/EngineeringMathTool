@@ -56,6 +56,24 @@ Trabajar con angulos se vuelve mucho más sencillo:
 Asi si hiciesemos sin(90ºd) obtendriamos un bonito 0 y sin complicarnos la vida haciendo conversiones con una calculadora a radianes.
 ```
 
+### Trabajo con Funciones
+Para trabajr con funciones se utilizarán los símbolos "[" y "]". Asi para crear una matriz en cualquier punto:
+```
+[1,2,3;4,5,6;7,8,9]
+Crearia:
+[1 2 3
+ 4 5 6
+ 7 8 9]
+```
+Para acceder a cualquier valor de una matriz:
+```
+matriz[1,2] : Accederia al valor en la segunda fila (se empieza contando desde el 0) y la tercera columna.
+matriz[1:2,1:3] : Devolveria una matriz de dimension 2x3 obteniendo los valores de la matriz.
+Asi cogeriamos los elementos de la matriz de la segunda y tercer fila y de las columnas 2 hasta la 4.
+matriz[1:1:2,1:2:3]: Haria parecido al anterior código pero nos devolveria una matriz 2x2. Cogeriamos los elementos de la segunda y tercer fila y los elementos de la 2 y 4 fila (El valor intermedio: 1:"2":3 indica un salto entre filas o columnas).
+```
+
+
 Los nombres de clases e interfaces estaran en Español o Spanglish para evitar usar nombres de clases ya existentes.
 Estoy todavia rehaciendo la clase ValorNumerico que pasará a trabajar directamente con complejos y no a ser un contenedor de otros números.
 La libreria Trabajara directamente consigomisma para los calculos sencillos y para los más complejos se utilizara la libreria common-math de apache que por lo que he visto parece muy avanzada y sigue siendo actualizada.
