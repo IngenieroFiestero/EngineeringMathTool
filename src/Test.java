@@ -29,6 +29,8 @@ public class Test {
 			Matriz mat2 = new Matriz("1,2,3;4,5,2");
 			Matriz res = mat2.sumar(mat);
 			System.out.println(res);
+			System.out.println("Obtener Submatriz-------------------");
+			System.out.println(res.getSubMatriz(new int[]{0,1,1}, new int[]{1,1,2}));
 		}catch(Exception e){
 			e.printStackTrace();
 		}

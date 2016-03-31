@@ -171,6 +171,12 @@ public class Matriz implements  Cloneable {
 			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
 	}
+	/**
+	 * No existen las divisiones, solo la multiplicaci車n por el inverso para poder trabajar de igual forma con matrices
+	 * @return
+	 * @throws MatrizException
+	 * @throws ValorNumericoException
+	 */
 	public Matriz invertir() throws MatrizException, ValorNumericoException{
 		int[] dim1 = this.dimensions();
 		Matriz ret = new Matriz(dim1);
@@ -275,6 +281,34 @@ public class Matriz implements  Cloneable {
 		}else {
 			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
+	}
+	/**
+	 * Devuelve una nueva matriz formada por valores de la matriz original. Estos valores se obtienen al utilizar la selecci車n de filas
+	 * y selecci車n de columnas. Estos no son m芍s que un vector de dimension 3 donde el primer elemento indica la fila o columna desde
+	 * donde empezar a coger elementos, el segundo indica el salto entre filas o columnas y el tercero la fila o columna l赤mite.
+	 * Como ejemplo: matriz1[1:1:3,1:1:2] devolveria una matriz 3x2
+	 * @param fila Parametro de selecci車n de columnas
+	 * @param columna Par芍metro de selecci車n de filas
+	 * @return
+	 * @throws MatrizException 
+	 */
+	public Matriz getSubMatriz(int[] fila,int[] columna) throws MatrizException{
+		int[] dimensiones = new int[]{(fila[2]-fila[0]+1)/fila[1],(columna[2]-columna[0]+1)/columna[1]};
+		if(!MatrizUtils.validDimension(matriz.length, fila) || !MatrizUtils.validDimension(matriz[0].length, columna)){
+			throw new MatrizException(MatrizException.generateErrorDimensions(this.dimensions(), dimensiones));
+		}
+		Matriz ret = new Matriz(dimensiones);
+		int fil = 0;
+		int col = 0;
+		for (int i = fila[0]; i < fila[2]+1; i=i+fila[1]) {
+			for (int j = columna[0]; j < columna[2]+1; j=j+columna[1]) {
+				ret.set(new int[]{fil, col},(ValorNumerico) matriz[i][j].clone());
+				col++;
+			}
+			col=0;
+			fil++;
+		}
+		return ret;
 	}
 
 }
