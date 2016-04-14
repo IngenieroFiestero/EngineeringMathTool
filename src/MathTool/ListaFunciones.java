@@ -1,3 +1,4 @@
+package MathTool;
 import java.util.ArrayList;
 
 public class ListaFunciones {

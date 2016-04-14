@@ -1,20 +1,25 @@
+package Variable;
+
 import java.util.HashMap;
 
-public class MatrizException extends Exception{
+public class VariableException extends Exception{
 	public static final String SPLITER = "%%";
-	public static final int TIPO = 2;
 	private static HashMap<Integer,String> codigos = defMensajes();
-	private static final long serialVersionUID = 4417246156437107684L;
-	
-	public MatrizException(String msg){
+	private static final long serialVersionUID = -2237549718724698585L;
+
+	public VariableException(String msg){
 		super(msg);
 	}
-	public MatrizException(String msg,Exception exception){
-		super(msg,exception);
+	public VariableException(String msg,Exception e){
+		super(msg,e);
 	}
-	public MatrizException(Exception exception){
-		super(exception);
+	public VariableException(Exception e){
+		super(e);
 	}
+	/**
+	 * Generador de mensajes por defecto para excepciones
+	 * @return
+	 */
 	private static HashMap<Integer,String> defMensajes(){
 		HashMap<Integer,String> map = new HashMap<Integer,String>();
 		map.put(1, "Matrix dimensions must agree: [" + SPLITER +"],["+ SPLITER + "]");
@@ -23,7 +28,6 @@ public class MatrizException extends Exception{
 		map.put(4, "Not Square matrix " + SPLITER);
 		return map;
 	}
-	
 	public static String generateErrorDimensions(int[] dim1,int[] dim2){
 		String algo = (String) codigos.get(1);
 		String[] vec = algo.split(SPLITER);
@@ -39,7 +43,6 @@ public class MatrizException extends Exception{
 	public static String notImplementedError(){
 		return codigos.get(3);
 	}
-	
 	public static String arrayToString(int[] val,int j){
 		String ret = "";
 		for (int i = 0; i < val.length && i < j; i++) {

@@ -1,4 +1,8 @@
+package MathTool;
 import java.util.ArrayList;
+
+import Matriz.Matriz;
+import Matriz.MatrizException;
 
 public class MathInterprete {
 	/**

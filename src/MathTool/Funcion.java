@@ -1,3 +1,4 @@
+package MathTool;
 
 public class Funcion {
 	private String name;

@@ -1,3 +1,4 @@
+package MathTool;
 
 public class MensajesExceptions extends Exception{
 	

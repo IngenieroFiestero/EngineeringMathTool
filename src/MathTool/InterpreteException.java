@@ -1,3 +1,4 @@
+package MathTool;
 import java.util.HashMap;
 
 public class InterpreteException extends Exception{

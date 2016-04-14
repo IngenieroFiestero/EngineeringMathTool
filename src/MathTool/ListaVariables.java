@@ -1,4 +1,7 @@
+package MathTool;
 import java.util.ArrayList;
+
+import Variable.Variable;
 /**
  * Lista de variables
  * @author admin

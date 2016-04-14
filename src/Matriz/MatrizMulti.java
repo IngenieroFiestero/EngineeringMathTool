@@ -1,4 +1,7 @@
+package Matriz;
 import java.lang.reflect.Array;
+
+import MathTool.VectorNumerico;
 
 public class MatrizMulti {
 	VectorNumerico vec;

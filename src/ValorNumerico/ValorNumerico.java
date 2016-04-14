@@ -1,3 +1,4 @@
+package ValorNumerico;
 import java.util.ArrayList;
 
 public class ValorNumerico implements Cloneable {

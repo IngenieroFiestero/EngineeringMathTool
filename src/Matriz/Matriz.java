@@ -1,7 +1,12 @@
+package Matriz;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Matriz implements  Cloneable {
+import MathTool.MathToken;
+import ValorNumerico.ValorNumerico;
+import ValorNumerico.ValorNumericoException;
+
+public class Matriz implements  Cloneable{
 	public static final int TIPO = 1;
 	ValorNumerico[][] matriz;
 
@@ -91,7 +96,7 @@ public class Matriz implements  Cloneable {
 	}
 
 
-	private void init() {
+	public void init() {
 		for (int i = 0; i < matriz.length; i++) {
 			for (int j = 0; j < matriz[0].length; j++) {
 				matriz[i][j] = new ValorNumerico(0,0);

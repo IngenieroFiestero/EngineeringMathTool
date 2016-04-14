@@ -1,3 +1,4 @@
+package MathTool;
 
 public class Settings {
 	public static final boolean DEFAULT_SIGNED = true;

@@ -1,8 +1,11 @@
+package MathTool;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import Variable.Variable;
 
 public class MathContext implements Serializable{
 	private static final long serialVersionUID = -8069695659613918920L;

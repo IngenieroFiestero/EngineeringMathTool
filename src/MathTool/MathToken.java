@@ -1,3 +1,4 @@
+package MathTool;
 
 public class MathToken {
 	public static final String FUNCION = "function";

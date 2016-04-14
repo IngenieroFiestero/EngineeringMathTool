@@ -1,3 +1,4 @@
+package ValorNumerico;
 import java.util.HashMap;
 
 public class ValorNumericoException extends Exception{
