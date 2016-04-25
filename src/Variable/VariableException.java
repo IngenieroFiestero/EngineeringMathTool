@@ -26,6 +26,7 @@ public class VariableException extends Exception{
 		map.put(2, "Cant add " + SPLITER);
 		map.put(3, "Not Implemented");
 		map.put(4, "Not Square matrix " + SPLITER);
+		map.put(5, "Not same variable");
 		return map;
 	}
 	public static String generateErrorDimensions(int[] dim1,int[] dim2){
@@ -42,6 +43,9 @@ public class VariableException extends Exception{
 	}
 	public static String notImplementedError(){
 		return codigos.get(3);
+	}
+	public static String notSameVariable(){
+		return codigos.get(5);
 	}
 	public static String arrayToString(int[] val,int j){
 		String ret = "";

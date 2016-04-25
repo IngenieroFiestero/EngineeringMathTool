@@ -132,7 +132,6 @@ public class Matriz implements  Cloneable{
 			}
 		}
 	}
-
 	public String toString() {
 		String ret = "[";
 		for (int i = 0; i < matriz.length ; i++) {

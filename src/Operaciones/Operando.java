@@ -1,14 +1,10 @@
 package Operaciones;
 
-import MathTool.*;
-import Matriz.Matriz;
-
 public class Operando {
-	private Matriz matriz;
-	public Operando(Matriz matriz){
-		this.matriz = matriz;
+	private Object operando;
+	public Operando(Object operando){
+		this.operando = operando;
 	}
-	public Matriz getValor(){
-		return this.matriz;
-	}
+	//Como cojones hago esto? porque una matriz puede contener expresiones
+	//Y un operando 
 }

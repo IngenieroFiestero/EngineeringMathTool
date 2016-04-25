@@ -1,8 +1,8 @@
 package MathTool;
 
-import Matriz.Matriz;
-import ValorNumerico.ValorNumerico;
-import ValorNumerico.ValorNumericoException;
+import Matriz.*;
+import ValorNumerico.*;
+import Variable.*;
 
 public class Test {
 
