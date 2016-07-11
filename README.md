@@ -2,6 +2,32 @@
 A mathematical library written in java.
 
 La libreria ahora permite trabajar directamente con complejos usando la clase ValorNumerico. Aunque ésta trabaja con valores de tipo double y no con BigDecimal (BigDecimal permite eliminar problemas de pérdidas de precision al hacer divisiones), hace uso de una tercera variable llamada divisor (un denominador de tipo real) que permite que las divisiones se conviertan únicamente en mutiplicaciones y la division se almacene para al final de todos los cálculos mostrarse al llamar a toString(). Un ejemplo de su funcionamiento:
+
+Ejemplo del interprete matematico en modo debug:
+```
+Llamada con texto: [a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);
+Limpiar linea
+Llamada con texto: [a,b]=x+pepe([2],3,pepe2(7,9))+(4*5)
+Asignar
+Matriz Variable
+Llamada con texto: x+pepe([2],3,pepe2(7,9))+(4*5)
+Sumando
+x .... pepe([2],3,pepe2(7,9))+(4*5)
+Llamada con texto: x
+Variable
+Llamada con texto: pepe([2],3,pepe2(7,9))+(4*5)
+Sumando
+pepe([2],3,pepe2(7,9)) .... (4*5)
+Llamada con texto: pepe([2],3,pepe2(7,9))
+Funcion
+Llamada con texto: pepe2(7,9)
+Funcion
+Llamada con texto: (4*5)
+Parentesis
+Llamada con texto: 4*5
+Multiplicando
+```
+
 ```
 4.0 -2.5i / 6.0i
 Numerador = 15.0 24.0i ,divisor:36.0
