@@ -1,7 +1,18 @@
 package ValorNumerico;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ValorNumerico implements Cloneable {
+import MathTool.MathSerialize;
+import Variable.Variable;
+
+public class ValorNumerico implements Cloneable,Serializable {
+	private static final long serialVersionUID = -2942022796658879818L;
 	private double real;
 	private double imaginario;
 	private double divisor;
@@ -34,14 +45,19 @@ public class ValorNumerico implements Cloneable {
 		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
 	}
 
-	public ValorNumerico(String numero) {
+	public ValorNumerico(String numero) throws ValorNumericoException {
 		String[] valores = spliter(numero);
 		ArrayList<Integer> numeros = new ArrayList<Integer>();
+		boolean valid = true;
 		double imagin = 0;
 		double real = 0;
 		for (int i = 0; i < valores.length; i++) {
 			if (isNumber(valores[i])) {
 				numeros.add(new Integer(i));
+			}else if(valores[i].equals("i") || valores[i].equals("+") || valores[i].equals("-") || valores[i].equals(" ")){
+				
+			}else{
+				valid = false;
 			}
 		}
 		for (int i = 0; i < numeros.size(); i++) {
@@ -60,6 +76,9 @@ public class ValorNumerico implements Cloneable {
 					real = Double.parseDouble(valores[pos]);
 				}
 			}
+		}
+		if(!valid){
+			throw new ValorNumericoException("Not Valid");
 		}
 		this.real = real;
 		this.imaginario = imagin;
@@ -312,5 +331,26 @@ public class ValorNumerico implements Cloneable {
 		if (val.equals(ValorNumerico.ZERO)) {
 			throw new ValorNumericoException(ValorNumericoException.generarErrorDenominadorNulo());
 		}
+	}
+	public static ValorNumerico load(InputStream is) throws IOException{
+		DataInputStream dis = new DataInputStream(is);
+		double real = dis.readDouble();
+		double imaginario = dis.readDouble();
+		double divisor = dis.readDouble();
+		dis.close();
+		return new ValorNumerico(real,imaginario,divisor);
+	}
+	public void save(OutputStream os) throws IOException{
+		DataOutputStream dos = new DataOutputStream(os);
+		//Escribir primero el tipo de informacion que vamos a almacenar
+		dos.writeDouble(this.real);
+		dos.writeDouble(this.imaginario);
+		dos.writeDouble(this.divisor);
+		dos.close();//Siempre mandar la informacion directamente al OutputStream al acabar
+	}
+	public byte[] getBytes() throws IOException{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		this.save(baos);
+		return baos.toByteArray();
 	}
 }

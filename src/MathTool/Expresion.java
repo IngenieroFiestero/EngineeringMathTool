@@ -8,7 +8,7 @@ public class Expresion {
 	public Expresion(String expresion){
 		this.expresion = expresion;
 	}
-	public Operacion[] getOperaciones(){
-		return null;
+	public String getExpresion(){
+		return this.expresion;
 	}
 }

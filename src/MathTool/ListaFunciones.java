@@ -34,4 +34,12 @@ public class ListaFunciones {
 		lista.add(new Funcion("sin"));
 		return new ListaFunciones(lista);
 	}
+	public void addFuncion(Funcion fun){
+		try {
+			findFuncionByName(fun.getName());
+		} catch (InterpreteException e) {
+			this.funcionList.add(fun);
+		}
+		
+	}
 }

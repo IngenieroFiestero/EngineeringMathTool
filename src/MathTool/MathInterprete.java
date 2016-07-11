@@ -1,20 +1,46 @@
 package MathTool;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.Executor;
+
+import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import Matriz.Matriz;
 import Matriz.MatrizException;
+import Matriz.MatrizExpresion;
+import Operaciones.ExpresionInterpretada;
+import Operaciones.ListaOperaciones;
+import Operaciones.Operacion;
+import Operaciones.Operador;
+import Operaciones.Operando;
+import Operaciones.Resultado;
+import ValorNumerico.ValorNumericoException;
+import Variable.Variable;
 
 public class MathInterprete {
+	public static final int ASIGNACION = 0;
+	public static final int EVALUACION = 1;
+	public static final int FINAL = 2;
+	public static final int INICIO_BUCLE = 3;
+	public static final int INICIO_CONDICION = 4;
+	public static final int INICIO_SUBCONDICION = 5;
+	public static final int FUNCION = 6;
+	public static final int THREAD = 7;
+	public static final int JOIN_THREADS = 7;
+	public static final char[] separadores = new char[]{'=','+','-','*','/','^','%','\'',';',','};//El simbolo ' se utiliza para transponer matrices
+	public static final int[] IMPORTANCIA = new int[]{6,4,4,3,3,2,2,1,7,5};
+	public static final char[] SEPARADOR_IMPORTANCIA = new char[]{';',',','+','-','*','/','%','^','\''};//El simbolo ' se utiliza para transponer matrices
+	public static final char[] SEPRADOR_NIVEL = new char[]{'[',']','{','}','(',')'};//Separadores en niveles
 	/**
-	 * Funcion para crear nueva funcion Expresion para resolverla ASIGNACION
-	 * para asignar a una variable un valor EVALUACION para evaluar comandos
+	 * Funcion para crear nueva funcion, Expresion para resolverla, ASIGNACION
+	 * para asignar a una variable un valor, EVALUACION para evaluar comandos
 	 * rapidos
 	 * 
 	 * @author admin
 	 *
 	 */
 	public static enum TIPO {
-		FUNCION, EXPRESION, ASIGNACION, EVALUACION
+		FUNCION, SCRIPT, ASIGNACION, EVALUACION
 	};
 
 	private MathContext contexto;
@@ -28,36 +54,429 @@ public class MathInterprete {
 	public MathInterprete(MathContext contexto) {
 		this.contexto = contexto;
 	}
-
-	public String evaluar(String txt) {
-		TIPO tipo = analizar(txt);
+	/**
+	 * Ejemplo Codigos:<br>
+	 * FUNCION<br>
+	 * function [err,res1,res2] = miFuncion1(param1,param2)<br>
+	 * 	res1=param1;<br>
+	 * 	res2=param2;<br>
+	 * end<br>
+	 * EVALUACION<br>
+	 * 8*2<br>
+	 * ASIGNACION<br>
+	 * val1=5*3+2*8+miFuncion1(1,2);<br>
+	 * @param txt
+	 * @return
+	 * @throws InterpreteException 
+	 */
+	public Object evaluarExpresion(String txt, Executor exec){
+		
+		return txt;
+	}
+	/**
+	 * Obtiene la ultima operacion de la cadena de texto
+	 * @param txt
+	 * @param ops
+	 * @return
+	 * @throws InterpreteException 
+	 */
+	public Operacion getOperacion(String txt,ListaOperaciones ops) throws InterpreteException{
+		System.out.println("Llamada con texto: " + txt);
+		if(txt == null || txt.length() == 0){
+			
+		}else if(txt.charAt(txt.length()-1) == ';'){
+			System.out.println("Limpiar linea");
+			//El ultimo caracter es para no imprimir por pantalla
+			Operacion op = new Operacion(new Operando[]{
+					new Operando(getOperacion(txt.substring(0,txt.length()-1),ops).getId())},
+					Operador.CIERRE_LINEA);
+			//Hemos creado la operacion ahora la insertamos y le asignamos un id
+			ops.insert(op);
+			return op;
+		}else{
+			String[] split = spliterEspecial(txt,new char[]{'='});
+			if(split.length == 3 && split[1].equals("=")){
+				System.out.println("Asignar");
+				//Es una operacion de asignacion
+				Operando op1 = null;
+				if(validVariableName(split[0])){
+					//Es una unica variable
+					op1 = new Operando(new Variable(split[0]));
+				}else if(isMatrizVariables(split[0])){
+					System.out.println("Matriz Variable");
+					//Es una matrizde variables
+					try {
+						op1 = new Operando(new MatrizExpresion(split[0]));
+					} catch (MatrizException e) {}
+				}
+				Operacion op = new Operacion(new Operando[]{
+						op1,
+						new Operando(getOperacion(split[2],ops).getId())},
+						Operador.ASIGNACION);
+				//Hemos creado la operacion ahora la insertamos y le asignamos un id
+				op.setId(ops.insert(op));
+				return op;
+			}else{
+				int lvl = 0;
+				boolean salir = false;
+				while(!salir){
+					if(lvl == 0){
+						//Separar en sumas
+						split = spliterEspecial(txt, new char[]{'+','-'});
+						if(split.length == 1){
+							lvl++;
+						}else if(split.length == 2){
+							if(split[0].equals("-")){
+								Operacion op = new Operacion(new Operando[]{new Operando("-1"),new Operando(split[1])},Operador.MULTIPLICACION);
+								op.setId(ops.insert(op));
+								return op;
+							}else if(split[0].equals("+")){
+								Operacion op = new Operacion(new Operando[]{new Operando(split[1])},Operador.EVALUACION);
+								op.setId(ops.insert(op));
+								return op;
+							}else{
+								throw new InterpreteException("Not valid sumando");
+							}
+						}else{
+							System.out.println("Sumando");
+							Operacion op = null;
+							String op1 = "";
+							String op2 = "";
+							int suma = Operador.SUMA;
+							boolean encontrado = false;
+							for (int i = 0; i < split.length && !encontrado; i++) {
+								if(split[i].equals("+")){
+									encontrado = true;
+									for (int j = i+1; j < split.length; j++) {
+										op2 = op2 + split[j];
+									}
+								}else if(split[i].equals("-")){
+									encontrado = true;
+									for (int j = i+1; j < split.length; j++) {
+										op2 = op2 + split[j];
+									}
+									suma = Operador.RESTA;
+								}else{
+									op1 = op1 + split[i];
+								}
+							}
+							System.out.println(op1 + " .... " + op2);
+							op = new Operacion(new Operando[]{
+									new Operando(getOperacion(op1, ops)),
+									new Operando(getOperacion(op2, ops))
+							},suma);
+							op.setId(ops.insert(op));
+							return op;
+						}
+					}else if(lvl == 1){
+						split = spliterEspecial(txt, new char[]{'*','/'});
+						if(split.length < 3){
+							lvl++;
+						}else{
+							System.out.println("Multiplicando");
+							Operacion op = null;
+							String op1 = "";
+							String op2 = "";
+							int suma = Operador.MULTIPLICACION;
+							boolean encontrado = false;
+							for (int i = 0; i < split.length && !encontrado; i++) {
+								if(split[i].equals("*")){
+									encontrado = true;
+									for (int j = i+1; j < split.length; j++) {
+										op2 = op2 + split[j];
+									}
+								}else if(split[i].equals("/")){
+									encontrado = true;
+									for (int j = i+1; j < split.length; j++) {
+										op2 = op2 + split[j];
+									}
+									suma = Operador.DIVISION;
+								}else if(split[i].equals(".*")){
+									encontrado = true;
+									for (int j = i+1; j < split.length; j++) {
+										op2 = op2 + split[j];
+									}
+									suma = Operador.MULTIPLICACION_P2P;
+								}else if(split[i].equals("./")){
+									encontrado = true;
+									for (int j = i+1; j < split.length; j++) {
+										op2 = op2 + split[j];
+									}
+									suma = Operador.DIVISION_P2P;
+								}else{
+									op1 = op1 + split[i];
+								}
+							}
+							op = new Operacion(new Operando[]{
+									new Operando(hasMoreLevels(op1)? getOperacion(op1, ops) : op1),
+									new Operando(hasMoreLevels(op2)? getOperacion(op2, ops) : op2)
+							},suma);
+							op.setId(ops.insert(op));
+							return op;
+						}
+					}else if(lvl == 2){
+						split = spliterEspecial(txt, new char[]{'%','^'});
+						lvl++;
+					}else if(lvl == 3){
+						split = spliterEspecial(txt, new char[]{'\''});
+						lvl++;
+					}else if(lvl == 4){
+						//Funciones
+						if(isFuncion(txt)){
+							System.out.println("Funcion");
+							Operacion op = llamarOperacion(txt,ops);
+							op.setId(ops.insert(op));
+							return op;
+						}else{
+							lvl++;
+						}
+					}else if(lvl == 5){
+						//Variables
+						if(validVariableName(txt)){
+							System.out.println("Variable");
+							//Creamos una funcion vacia que solo usaremos para recuperar un valor
+							Operacion op = new Operacion(new Operando[]{new Operando(new Variable(txt))}, Operador.EVALUACION);
+							op.setId(ops.insert(op));
+							return op;
+						}else{
+							lvl++;
+						}
+					}else if(lvl == 6){
+						//Operaciones dentro de parentesis etc
+						String txt2 = innerExpresion(txt);
+						if(txt2 == null){
+							lvl++;
+						}else{
+							System.out.println("Parentesis");
+							return getOperacion(txt2, ops);
+						}
+						
+					}else{
+						System.out.println("Es un numero");
+						Operacion op = new Operacion(new Operando[]{new Operando(txt)}, Operador.EVALUACION);
+						op.setId(ops.insert(op));
+						return op;
+					}
+				}
+				
+			}
+		}
+		return null;
+	}
+	public Operacion llamarOperacion(String txt,ListaOperaciones op) throws InterpreteException{
+		String name = getFunctionName(txt);
+		System.out.println(name);
+		if(isFuncion(txt)){
+			String[] args = getArgs(txt);
+			Operando[] operandos = new Operando[args.length+1];
+			operandos[0] = new Operando(name);
+			for (int i = 1; i < args.length; i++) {
+				System.out.println("Args["+ i+"]: " + args[i]);
+				operandos[i] = new Operando(new Integer(getOperacion(args[i],op).getId()));
+			}
+			Operacion operacion = new Operacion(operandos, Operador.EJECUTAR_FUNCION);
+			return operacion;
+		}else{
+			throw new InterpreteException("Not valid Function");
+		}
+	}
+	public boolean isMatrizVariables(String txt){
+		if(txt.charAt(0) == '[' && txt.charAt(txt.length() -1) == ']'){
+			String[] split = spliterEspecial(txt.substring(1,txt.length()-2), new char[]{','});
+			if(split.length == 1){
+				return false;
+			}
+			for (int i = 0; i < split.length; i++) {
+				if(!split[i].equals(",") && !split[i].equals("") && !validVariableName(split[i])){
+					return false;
+				}
+			}
+			return true;
+		}else{
+			return false;
+		}
+	}
+	public static boolean isFuncion(String txt){
+		String[] args = spliter(txt);
+		String name = "2";
+		if(args.length == 1 && hasMoreLevels(args[0])){
+			name = getFunctionName(args[0]);
+		}
+		if(validVariableName(name)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	public static String getFunctionName(String txt){
+		int inicio = -1;
+		boolean encontrado = false;
+		for (int i = 0; i < txt.length() && !encontrado; i++) {
+			if(txt.charAt(i) == '('){
+				inicio = i-1;
+			}
+		}
+		if(inicio <0){
+			return "";
+		}
+		return txt.substring(0, inicio);
+	}
+	public static String[] getArgs(String txt){
+		int level = 0;
+		ArrayList<String> args = new ArrayList<String>();
+		int lastPos = 0;
+		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
+		boolean encontrado = false;
+		for (int i = 0; i <txt.length(); i++) {
+			encontrado = false;
+			//Buscar separadores en cada caracter
+			for (int j = 0; j < SEPRADOR_NIVEL.length && !encontrado; j++) {
+				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
+					if(j%2 == 1){
+						level--;
+						if(level == 1){
+							lastPos = i+1;
+						}else if(level == 0){
+							args.add(txt.substring(lastPos, i));
+						}
+					}else{
+						level++;
+						if(level == 1){
+							lastPos = i+1;
+						}
+					}
+				}
+			}
+			if(!encontrado){
+				if(txt.charAt(i) == ',' && level == 1){
+					args.add(txt.substring(lastPos, i));
+					lastPos=i+1;
+				}
+			}
+		}
+		System.out.println("Argumentos: ");
+		for (int i = 0; i < args.size(); i++) {
+			System.out.println(args.get(i));
+		}
+		return args.toArray(new String[args.size()]);
+	}
+	/**
+	 * Convierte una linea de codigo en una expresion interpretada
+	 * @param txt
+	 * @return
+	 */
+	public ExpresionInterpretada compilar(String txt){
+		String[] split = spliter(txt);
+		ListaOperaciones lo = new ListaOperaciones();
+		ExpresionInterpretada ei = new ExpresionInterpretada(txt);
+		ei.setListaOperaciones(lo);
+		int tipo = setTipo(txt);
 		switch (tipo) {
+		case FINAL:
+			break;
 		case FUNCION:
 			break;
-		case ASIGNACION:
-			break;
-		case EVALUACION:
-			return evaluacion(txt);
-		case EXPRESION:
+		case INICIO_BUCLE:
 			break;
 		default:
 			break;
 		}
-		return "";// Borrar despues
+		return ei;
 	}
-
-	private String evaluacion(String txt) {
-		String ret="";
-		try {
-			int[][] pos = findMatriz(txt);
-			for (int i = 0; i < pos.length; i++) {
-				Matriz mat = new Matriz(txt.substring(pos[0][i], pos[1][i]));
+	/**
+	 * Aqui esta toda la miga del pan, analiza la operacion y en funcion del tipo y los parametros que posea la ejecuta
+	 * @param op
+	 * @param lo
+	 * @return
+	 * @throws InterpreteException
+	 */
+	private String realizarOperacion(Operacion op,ListaOperaciones lo) throws InterpreteException{
+		String ret = "";
+		Operando[] opd = op.getOperandos();
+		int operador = op.getOperador();
+		Operando[] aux = null;
+		switch (operador) {
+		case Operador.ASIGNACION:
+			//Operacion de asignacion
+			if(opd[0].getTipo() == Operando.VARIABLE){
+				String name = (String)opd[0].getValor();
+				if(validVariableName(name) && opd.length == 2){
+					aux = new Operando[opd.length -1];
+					for (int i = 0; i < aux.length; i++) {
+						aux[i] = (Operando) asignarValores(opd[i], this.contexto, lo);
+					}
+					Variable var = new Variable(name);
+					Object valor = aux[0].getValor();
+					var.setValor(valor);
+					this.contexto.addVariable(var);
+					ret = ret + name + "\t=\t" + valor + "\n";
+				}else{
+					throw new InterpreteException("Not valid variable name");
+				}
+			}else{
+				throw new InterpreteException("Variable name not found");
 			}
-		} catch (InterpreteException e) {
-		}catch (MatrizException me) {}
+			break;
+		case Operador.SUMA:
+			//Operacion suma
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = (Operando) asignarValores(opd[i], this.contexto, lo);
+			}
+			try {
+				Operador.suma(aux[0], aux[1]);
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.MULTIPLICACION:
+			//Operacion multiplicacion
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = (Operando) asignarValores(opd[i], this.contexto, lo);
+			}
+			try {
+				Operador.multiplicacion(aux[0], aux[1]);
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.CIERRE_LINEA:
+			//Operacion multiplicacion
+			ret = "";
+			break;
+		default:
+			break;
+		}
 		return ret;
 	}
-
+	/**
+	 * Interpreta una Expresion ya compilada y devuelve la respuesta para la consola
+	 * Este metodo desempaqueta todas las operaciones y las ejecuta. Podra ejecutar tareas en paralelo en un futuro
+	 * @param ei
+	 * @return
+	 * @throws InterpreteException 
+	 */
+	public String interpretarExpresion(ExpresionInterpretada ei) throws InterpreteException{
+		String ret = "";
+		int tipo = ei.getTipo();
+		ListaOperaciones lo = ei.getListaOperaciones();
+		int size = lo.size();
+		Operacion op = null;
+		for (int i = 0; i < size; i++) {
+			op = lo.get(i);
+			ret = ret + realizarOperacion(op, lo);
+			if(op.getOperador() == Operador.CIERRE_LINEA){
+				//Si la ultima operacion es el cierre de linea entonces no escribimos nada por pantalla
+				ret = "";
+			}
+		}
+		return ret;
+	}
 	public static int[][] findMatriz(String txt) throws InterpreteException {
 		ArrayList<Integer> inicioM = null;
 		ArrayList<Integer> finalM = null;
@@ -101,27 +520,247 @@ public class MathInterprete {
 			throw new InterpreteException("");
 		}
 	}
-
+	public Funcion getFuncionByName(String name) throws InterpreteException{
+		return contexto.findFuncionByName(name);
+	}
+	public MathContext getMathContext(){
+		return this.contexto;
+	}
+	public void setMathContext(MathContext mc){
+		this.contexto = mc;
+	}
 	/**
-	 * Analiza la cadena para saber que hacer con ella. Si es una funcion, si es
-	 * una expresion para resolver, si asigna a una variable cierto valor, si
-	 * evalua la expresion
-	 * 
+	 * Separa la cadena de linea de codigo en caracteres especiales para una mayor sencillez de interpretacion
 	 * @param txt
-	 *            Cadena a analizar
-	 * @return TIPO
+	 * @return
 	 */
-	public TIPO analizar(String txt) {
-		String[] tokens = txt.split(" ");
-		if (tokens[0].equals(MathToken.FUNCION)) {
-			return TIPO.FUNCION;
-		} else if (tokens[0].equals(MathToken.ASIGNACION)) {
-			return TIPO.ASIGNACION;
-		} else if (txt.contains(MathToken.ASIGNACION)) {
-			return TIPO.EXPRESION;
-		} else {
-			return TIPO.EVALUACION;
+	public static String[] spliterEspecial(String txt,char[] separadores){
+		txt.replaceAll("\n", "");
+		ArrayList<String> ret = new ArrayList<String>();
+		int lastPos = 0;
+		int lvl = 0;
+		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
+		boolean encontrado = false;
+		for (int i = 0; i <txt.length(); i++) {
+			encontrado = false;
+			//Comprobamos primero si la letra es un separador de nivel, para lo cual si lo es subimos un nivel
+			for (int j = 0; j < SEPRADOR_NIVEL.length; j++) {
+				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
+					//Es un separador de nivel
+					if(j%2==1){
+						lvl--;
+					}else{
+						lvl++;
+					}
+					encontrado = true;
+				}
+			}
+			//Buscar separadores en cada caracter
+			for (int j = 0; j < separadores.length && !encontrado && lvl == 0; j++) {
+				if(txt.charAt(i) == separadores[j]){
+					//El anterior era un separador
+					if(lastPos >= i-1){
+						//Es un punto
+						encontrado = true;
+						if(lastPos != i){
+							ret.add(txt.substring(lastPos, i));
+						}
+						ret.add(txt.substring(i, i+1));
+						lastPos = i+1;
+					}else if(i-1 >0 && lastPos >= 0){
+						if(txt.charAt(i-1) == '.'){
+							ret.add(txt.substring(lastPos, i-1));
+							ret.add(txt.substring(i-1, i+1));
+						}else{
+							ret.add(txt.substring(lastPos, i));
+							ret.add(txt.substring(i, i+1));
+						}
+						encontrado = true;
+						lastPos = i+1;
+					}
+				}
+			}
+		}
+		ret.add(txt.substring(lastPos, txt.length()));
+		return ret.toArray(new String[ret.size()]);
+	}
+	/**
+	 * Separa la cadena de linea de codigo en caracteres especiales para una mayor sencillez de interpretacion
+	 * @param txt
+	 * @return
+	 */
+	public static String[] spliter(String txt){
+		txt.replaceAll("\n", "");
+		ArrayList<String> ret = new ArrayList<String>();
+		int lastPos = 0;
+		int lvl = 0;
+		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
+		boolean encontrado = false;
+		for (int i = 0; i <txt.length(); i++) {
+			encontrado = false;
+			//Comprobamos primero si la letra es un separador de nivel, para lo cual si lo es subimos un nivel
+			for (int j = 0; j < SEPRADOR_NIVEL.length; j++) {
+				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
+					//Es un separador de nivel
+					if(j%2==1){
+						lvl--;
+					}else{
+						lvl++;
+					}
+					encontrado = true;
+				}
+			}
+			//Buscar separadores en cada caracter
+			for (int j = 0; j < separadores.length && !encontrado && lvl == 0; j++) {
+				if(txt.charAt(i) == separadores[j]){
+					//El anterior era un separador
+					if(lastPos >= i-1){
+						//Es un punto
+						encontrado = true;
+						if(lastPos != i){
+							ret.add(txt.substring(lastPos, i));
+						}
+						ret.add(txt.substring(i, i+1));
+						lastPos = i+1;
+					}else if(i-1 >0 && lastPos >= 0){
+						if(txt.charAt(i-1) == '.'){
+							ret.add(txt.substring(lastPos, i-1));
+							ret.add(txt.substring(i-1, i+1));
+						}else{
+							ret.add(txt.substring(lastPos, i));
+							ret.add(txt.substring(i, i+1));
+						}
+						encontrado = true;
+						lastPos = i+1;
+					}
+				}
+			}
+		}
+		ret.add(txt.substring(lastPos, txt.length()));
+		return ret.toArray(new String[ret.size()]);
+	}
+	/**
+	 * Analiza internamente la linea para obtener el tipo
+	 */
+	private int setTipo(String linea){
+		int tipo = -1;
+		String[] split = spliter(linea);//Posible optimizacion ya que no hace falta hacer un split completo
+		if(split[0].equals("function")){
+			tipo = FUNCION;
+			//Es un script funcion
+		}else if(split[0].equals("thread")){
+			tipo = THREAD;
+			//Es un script que se ejecuta en paralelo
+		}else if(split[0].equals("wait")){
+			tipo = JOIN_THREADS;
+			//Es un script que se ejecuta en paralelo
+		}else{
+			if(validVariableName(split[0]) && split[1].equals(MathToken.ASIGNACION)){
+				//El primero es una variable a la que se iguala algo (x=5)
+				tipo = ASIGNACION;
+			}else if(split[0].equals("for")){
+				tipo = INICIO_BUCLE;
+				//Un bucle for (for i=1:10)
+			}else if(split[0].equals("while")){
+				tipo = INICIO_BUCLE;
+				//Un bucle for (for i=1:10)
+			}else if(split[0].equals("if")){
+				tipo = INICIO_CONDICION;
+				//condicion if(if x==5)
+			}else if(split[0].equals("elsif")){
+				tipo = INICIO_SUBCONDICION;
+				//condicion if(if x==5)
+			}else if(split[0].equals("end") && split.length == 1){
+				tipo = FINAL;
+				//baja un nivel (end)
+			}
+		}
+		return tipo;
+	}
+	/**
+	 * Devuelve true si el nombre de variable es valido: solo letras y numeros y debe empezar por letras
+	 * @return
+	 */
+	public static boolean validVariableName(String txt){
+		return txt.matches("^[a-zA-Z][a-zA-Z0-9]*$");
+	}
+	public static boolean hasMoreLevels(String txt){
+		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
+		for (int i = 0; i <txt.length(); i++) {
+			//Buscar separadores en cada caracter
+			for (int j = 0; j < SEPRADOR_NIVEL.length; j++) {
+				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	public static int isOperador(String txt){
+		int pos = 0;
+		if(txt.charAt(0) == '.'){
+			pos = 1;
+		}
+		//El ultimo es un separador(coma) para funciones etc
+		for (int i = 0; i < separadores.length-1; i++) {
+			if(txt.charAt(pos) == separadores[i]){
+				return i;
+			}
+		}
+		return -1;
+	}
+	public static String innerExpresion(String txt){
+		int level = 0;
+		int inicio = -1;
+		int fin = -1;
+		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
+		boolean encontrado = false;
+		for (int i = 0; i <txt.length() && (inicio == -1 || fin == -1); i++) {
+			encontrado = false;
+			//Buscar separadores en cada caracter
+			for (int j = 0; j < SEPRADOR_NIVEL.length && !encontrado; j++) {
+				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
+					encontrado = true;
+					if(j%2 == 1){
+						level--;
+						if(level == 0){
+							fin = i;
+						}
+					}else{
+						level++;
+						if(level == 1){
+							inicio = i;
+						}
+					}
+				}
+			}
+		}
+		if(inicio == -1 || fin == -1){
+			return null;
+		}else{
+			return txt.substring(inicio+1, fin);
 		}
 	}
-
+	/**
+	 * Devuelve el verdadero valor para este operando
+	 * @param op
+	 * @param mc
+	 * @param lo
+	 * @return
+	 * @throws InterpreteException
+	 */
+	private Object asignarValores(Operando op,MathContext mc,ListaOperaciones lo) throws InterpreteException{
+		switch (op.getTipo()) {
+		case Operando.VARIABLE:
+			return mc.findVariableByName((String)op.getValor()).getValue();
+		case Operando.RESULTADO:
+			return lo.get(((Integer)op.getValor()).intValue()).getResultado().getValor();
+		case Operando.VALOR_NUMERICO:
+			return op.getValor();
+		case Operando.MATRIZ:
+			return op.getValor();
+		default:
+			return op.getValor();
+		}
+	}
 }

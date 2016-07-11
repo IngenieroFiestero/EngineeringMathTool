@@ -26,6 +26,13 @@ public class ListaVariables {
 		}
 		throw new InterpreteException(InterpreteException.generateCantFindError(name));
 	}
+	public void addVariable(Variable var)throws InterpreteException{
+		if(variableList.contains(var)){
+			throw new InterpreteException(InterpreteException.generateAlredyExistsError(var.getName()));
+		}else{
+			variableList.add(var);
+		}
+	}
 	/**
 	 * Aqui se obtienen las funciones por defecto
 	 * @return ListaVariables por defecto, osea ninguna
