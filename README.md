@@ -27,7 +27,44 @@ Parentesis
 Llamada con texto: 4*5
 Multiplicando
 ```
+Y ahora como quedaria la lista de operaciones:
+```
+Size: 8
+Operacion numero: 0 eval
+Nº operandos: 1
+0 operando: x
+Operacion numero: 1 function
+Nº operandos: 3
+3 operando: pepe2
+1 operando: 7.0
+1 operando: 9.0
+Operacion numero: 2 function
+Nº operandos: 4
+3 operando: pepe
+2 operando: [2.0]
+1 operando: 3.0
+4 operando: 1
+Operacion numero: 3 *
+Nº operandos: 2
+1 operando: 4.0
+1 operando: 5.0
+Operacion numero: 4 +
+Nº operandos: 2
+4 operando: 2
+4 operando: 3
+Operacion numero: 5 +
+Nº operandos: 2
+4 operando: 0
+4 operando: 4
+Operacion numero: 6 =
+Nº operandos: 2
+5 operando: [a,b]
 
+4 operando: 5
+Operacion numero: 7 ;
+Nº operandos: 1
+4 operando: 6
+```
 ```
 4.0 -2.5i / 6.0i
 Numerador = 15.0 24.0i ,divisor:36.0
