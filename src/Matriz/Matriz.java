@@ -25,52 +25,57 @@ public class Matriz implements  Cloneable{
 		matriz[0][0] = val;
 	}
 	public Matriz(String txt) throws MatrizException{
-		txt = txt.replaceAll("\n", "");
-		txt = txt.replaceAll("\t", "");
-		int columnas = 0;
-		int filas = 1;
-		int lastPos = 0;//Indica la posicion del anterior separador
-		int columnaActual=0;
-		ArrayList<String> valores = new ArrayList<String>();
-		for (int i = 0; i < txt.length(); i++) {
-			if(txt.charAt(i) == MathToken.MATRIX_COLUMNA_SEPARATOR.charAt(0)){
-				valores.add(txt.substring(lastPos, i));
-				lastPos = i+1;
-				if(filas == 1){
-					columnas++;
-				}
-				columnaActual++;
-			}else if(txt.charAt(i) == MathToken.MATRIX_FILA_SEPARATOR.charAt(0)){
-				valores.add(txt.substring(lastPos, i));
-				if(filas == 1){
-					columnas++;
-				}
-				/* Si en algun momento habiendo mas de una fila, vamos a
-				 *  cambiar de fila y hay m�s columnas de las que deberia o menos
-				 *  tiramos error
-				 */
-				if(filas > 1 && columnaActual != columnas-1){
-					throw new MatrizException("error");
-				}
-				lastPos = i+1;
-				filas++;
-				columnaActual=0;
-			}else if(i == txt.length()-1){
-				valores.add(txt.substring(lastPos, txt.length()));
-				if(filas == 1){
-					columnas++;
-				}
-			}
-		}
-		matriz = new ValorNumerico[filas][columnas];
-		for (int i = 0; i < matriz.length; i++) {
-			for (int j = 0; j < matriz[0].length; j++) {
-				try {
-					matriz[i][j] = new ValorNumerico(valores.get(i*columnas+j));
-				} catch (ValorNumericoException e) {
-					throw new MatrizException(e.getMessage());
+		if(txt.charAt(0) == '[' && txt.charAt(txt.length()-1) == ']'){
+			txt = txt.substring(1,txt.length()-1);
+			txt = txt.replaceAll("\n", "");
+			txt = txt.replaceAll("\t", "");
+			int columnas = 0;
+			int filas = 1;
+			int lastPos = 0;//Indica la posicion del anterior separador
+			int columnaActual=0;
+			ArrayList<String> valores = new ArrayList<String>();
+			for (int i = 0; i < txt.length(); i++) {
+				if(txt.charAt(i) == ','){
+					valores.add(txt.substring(lastPos, i));
+					lastPos = i+1;
+					if(filas == 1){
+						columnas++;
+					}
+					columnaActual++;
+				}else if(txt.charAt(i) == ';'){
+					valores.add(txt.substring(lastPos, i));
+					if(filas == 1){
+						columnas++;
+					}
+					/* Si en algun momento habiendo mas de una fila, vamos a
+					 *  cambiar de fila y hay m�s columnas de las que deberia o menos
+					 *  tiramos error
+					 */
+					if(filas > 1 && columnaActual != columnas-1){
+						throw new MatrizException("error");
+					}
+					lastPos = i+1;
+					filas++;
+					columnaActual=0;
+				}else if(i == txt.length()-1){
+					valores.add(txt.substring(lastPos, txt.length()));
+					if(filas == 1){
+						columnas++;
+					}
 				}
 			}
+			matriz = new ValorNumerico[filas][columnas];
+			for (int i = 0; i < matriz.length; i++) {
+				for (int j = 0; j < matriz[0].length; j++) {
+					try {
+						matriz[i][j] = new ValorNumerico(valores.get(i*columnas+j));
+					} catch (ValorNumericoException e) {
+						throw new MatrizException(e.getMessage());
+					}
+				}
+			}
+		}else{
+			throw new MatrizException("Not valid initial caracter");
 		}
 	}
 	public boolean equals(Matriz mat) throws ValorNumericoException{

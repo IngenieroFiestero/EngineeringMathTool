@@ -265,14 +265,12 @@ public class MathInterprete {
 	}
 	public Operacion llamarOperacion(String txt,ListaOperaciones op) throws InterpreteException{
 		String name = getFunctionName(txt);
-		System.out.println(name);
 		if(isFuncion(txt)){
 			String[] args = getArgs(txt);
 			Operando[] operandos = new Operando[args.length+1];
 			operandos[0] = new Operando(name);
-			for (int i = 1; i < args.length; i++) {
-				System.out.println("Args["+ i+"]: " + args[i]);
-				operandos[i] = new Operando(new Integer(getOperacion(args[i],op).getId()));
+			for (int i = 0; i < args.length; i++) {
+				operandos[i+1] = new Operando(hasMoreLevels(args[i])? getOperacion(args[i], op) : args[i]);
 			}
 			Operacion operacion = new Operacion(operandos, Operador.EJECUTAR_FUNCION);
 			return operacion;
@@ -297,10 +295,17 @@ public class MathInterprete {
 		}
 	}
 	public static boolean isFuncion(String txt){
-		String[] args = spliter(txt);
-		String name = "2";
-		if(args.length == 1 && hasMoreLevels(args[0])){
-			name = getFunctionName(args[0]);
+		int inicio = -1;
+		boolean encontrado = false;
+		String name = "";
+		for (int i = 0; i < txt.length() && !encontrado; i++) {
+			if(txt.charAt(i) == '('){
+				inicio = i;
+				encontrado = true;
+				if(i>0){
+					name = txt.substring(0, inicio);
+				}
+			}
 		}
 		if(validVariableName(name)){
 			return true;
@@ -314,13 +319,19 @@ public class MathInterprete {
 		for (int i = 0; i < txt.length() && !encontrado; i++) {
 			if(txt.charAt(i) == '('){
 				inicio = i-1;
+				encontrado = true;
 			}
 		}
 		if(inicio <0){
 			return "";
 		}
-		return txt.substring(0, inicio);
+		return txt.substring(0, inicio+1);
 	}
+	/**
+	 * Obtiene los argumentos de un texto si este es una funcion
+	 * @param txt
+	 * @return
+	 */
 	public static String[] getArgs(String txt){
 		int level = 0;
 		ArrayList<String> args = new ArrayList<String>();
@@ -332,11 +343,10 @@ public class MathInterprete {
 			//Buscar separadores en cada caracter
 			for (int j = 0; j < SEPRADOR_NIVEL.length && !encontrado; j++) {
 				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
+					encontrado = true;
 					if(j%2 == 1){
 						level--;
-						if(level == 1){
-							lastPos = i+1;
-						}else if(level == 0){
+						if(level == 0){
 							args.add(txt.substring(lastPos, i));
 						}
 					}else{
@@ -347,16 +357,12 @@ public class MathInterprete {
 					}
 				}
 			}
-			if(!encontrado){
-				if(txt.charAt(i) == ',' && level == 1){
+			if(!encontrado && level == 1){
+				if(txt.charAt(i) == ','){
 					args.add(txt.substring(lastPos, i));
 					lastPos=i+1;
 				}
 			}
-		}
-		System.out.println("Argumentos: ");
-		for (int i = 0; i < args.size(); i++) {
-			System.out.println(args.get(i));
 		}
 		return args.toArray(new String[args.size()]);
 	}
@@ -688,7 +694,8 @@ public class MathInterprete {
 		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
 		for (int i = 0; i <txt.length(); i++) {
 			//Buscar separadores en cada caracter
-			for (int j = 0; j < SEPRADOR_NIVEL.length; j++) {
+			//No tenemos en cuenta las matrices solo parentesis y corchetes
+			for (int j = 2; j < SEPRADOR_NIVEL.length; j++) {
 				if(txt.charAt(i) == SEPRADOR_NIVEL[j]){
 					return true;
 				}

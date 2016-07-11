@@ -9,8 +9,10 @@ import java.io.OutputStream;
 
 import MathTool.Funcion;
 import Matriz.Matriz;
+import Matriz.MatrizException;
 import Matriz.MatrizExpresion;
 import ValorNumerico.ValorNumerico;
+import ValorNumerico.ValorNumericoException;
 import Variable.Variable;
 
 public class Operando {
@@ -40,7 +42,29 @@ public class Operando {
 		}else if(operando instanceof Matriz){
 			this.tipo = MATRIZ;
 		}else if(operando instanceof String){
-			this.tipo = EXPRESION;
+			String txt = (String)operando;
+			try {
+				ValorNumerico val = new ValorNumerico(txt);
+				this.operando = val;
+				this.tipo = VALOR_NUMERICO;
+			} catch (ValorNumericoException e) {
+				try {
+					Matriz mat = new Matriz(txt);
+					this.operando = mat;
+					this.tipo = MATRIZ;
+				} catch (MatrizException e1) {
+					this.tipo = EXPRESION;
+					this.operando = operando;
+					/*try {
+						MatrizExpresion me = new MatrizExpresion(txt);
+						this.operando = me;
+						this.tipo = MATRIZ_EXPRESION;
+					} catch (MatrizException e2) {
+						this.tipo = EXPRESION;
+						this.operando = operando;
+					}*/
+				}
+			}
 		}else if(operando instanceof Integer){
 			this.tipo = RESULTADO;
 		}else if(operando instanceof Operacion){

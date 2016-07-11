@@ -19,6 +19,9 @@ import ValorNumerico.*;
 public class Test {
 
 	public static void main(String[] args) throws MatrizException {
+		Matriz matP = new Matriz("[2]");
+		System.out.println(matP.toString());
+		System.out.println("----------------------------------");
 		ValorNumerico val = new ValorNumerico(15,12,3);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		ByteArrayInputStream is = null;
@@ -32,7 +35,7 @@ public class Test {
 		}
 		System.out.println(val);
 		System.out.println(val2);
-		Matriz mat1 = new Matriz("1,2,3;4,5,6");
+		Matriz mat1 = new Matriz("[1,2,3;4,5,6]");
 		Integer intg = new Integer(4);
 		Operacion op = new Operacion(new Operando[]{new Operando("paco"),new Operando(val2)}, Operador.SUMA);
 		ByteArrayOutputStream os2 = new ByteArrayOutputStream();
@@ -42,11 +45,12 @@ public class Test {
 			op.save(os2);
 			is2 = new ByteArrayInputStream(os2.toByteArray());
 			op2 = Operacion.load(is2);
+			System.out.println(op);
+			System.out.println(op2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(op);
-		System.out.println(op2);
+		
 		System.out.println("----------------------------------");
 		MathInterprete mi = new MathInterprete();
 		String[] spl = MathInterprete.spliter("[a,b]=x+pepe(2,3)+(4*5)");
@@ -65,7 +69,7 @@ public class Test {
 		System.out.println("----------------------------------");
 		ListaOperaciones ops = new ListaOperaciones();
 		try {
-			Operacion operac = mi.getOperacion("[a,b]=x+pepe(2,3)+(4*5);", ops);
+			Operacion operac = mi.getOperacion("[a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);", ops);
 			
 		} catch (InterpreteException e) {
 			// TODO Auto-generated catch block
