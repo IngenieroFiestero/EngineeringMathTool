@@ -22,7 +22,7 @@ public class ListaFunciones {
 				return funcionList.get(i);
 			}
 		}
-		throw new InterpreteException(InterpreteException.generateCantFindError(name));
+		throw new InterpreteException(InterpreteException.generateCantFindFunctionError(name));
 	}
 	
 	/**
@@ -31,7 +31,7 @@ public class ListaFunciones {
 	 */
 	public static ListaFunciones listaPorDefecto(){
 		ArrayList<Funcion> lista = new ArrayList<Funcion>();
-		lista.add(new Funcion("sin"));
+		lista.add(new Funcion("sqrt",FuncionUtils.SQRT));
 		return new ListaFunciones(lista);
 	}
 	public void addFuncion(Funcion fun){

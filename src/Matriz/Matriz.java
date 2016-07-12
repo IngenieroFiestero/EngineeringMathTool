@@ -322,6 +322,15 @@ public class Matriz implements  Cloneable{
 			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
 	}
+	public Matriz sqrt() throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].sqrt();
+			}
+		}
+		return mat;
+	}
 	/**
 	 * Devuelve una nueva matriz formada por valores de la matriz original. Estos valores se obtienen al utilizar la selecci��n de filas
 	 * y selecci��n de columnas. Estos no son m��s que un vector de dimension 3 donde el primer elemento indica la fila o columna desde

@@ -75,7 +75,6 @@ public class MathInterprete {
 		if(txt == null || txt.length() == 0){
 			
 		}else if(txt.charAt(txt.length()-1) == ';'){
-			System.out.println("Limpiar linea");
 			//El ultimo caracter es para no imprimir por pantalla
 			Operacion op = new Operacion(new Operando[]{
 					new Operando(getOperacion(txt.substring(0,txt.length()-1),ops).getId())},
@@ -86,14 +85,13 @@ public class MathInterprete {
 		}else{
 			String[] split = spliterEspecial(txt,new char[]{'='});
 			if(split.length == 3 && split[1].equals("=")){
-				System.out.println("Asignar");
+				System.out.println("Asignacion");
 				//Es una operacion de asignacion
 				Operando op1 = null;
 				if(validVariableName(split[0])){
 					//Es una unica variable
 					op1 = new Operando(new Variable(split[0]));
 				}else if(isMatrizVariables(split[0])){
-					System.out.println("Matriz Variable");
 					//Es una matrizde variables
 					try {
 						op1 = new Operando(new MatrizExpresion(split[0]));
@@ -152,8 +150,8 @@ public class MathInterprete {
 							}
 							System.out.println(op1 + " .... " + op2);
 							op = new Operacion(new Operando[]{
-									new Operando(getOperacion(op1, ops)),
-									new Operando(getOperacion(op2, ops))
+									new Operando(hasMoreLevels(op1)? getOperacion(op1, ops) : op1),
+									new Operando(hasMoreLevels(op2)? getOperacion(op2, ops) : op2)
 							},suma);
 							op.setId(ops.insert(op));
 							return op;
@@ -205,11 +203,11 @@ public class MathInterprete {
 							return op;
 						}
 					}else if(lvl == 2){
-						System.out.println("Elevando o modulo");
 						split = spliterEspecial(txt, new char[]{'%','^'});
 						if(split.length == 1){
 							lvl++;
 						}else if(split.length >= 3){
+							System.out.println("Elevando o modulo");
 							if(split[1].equals("%")){
 								
 							}else if(split[1].equals("^")){
@@ -271,7 +269,7 @@ public class MathInterprete {
 		if(isFuncion(txt)){
 			String[] args = getArgs(txt);
 			Operando[] operandos = new Operando[args.length+1];
-			operandos[0] = new Operando(name);
+			operandos[0] = new Operando(new Funcion(name));
 			for (int i = 0; i < args.length; i++) {
 				operandos[i+1] = new Operando(hasMoreLevels(args[i])? getOperacion(args[i], op) : args[i]);
 			}
@@ -408,21 +406,23 @@ public class MathInterprete {
 		case Operador.ASIGNACION:
 			//Operacion de asignacion
 			if(opd[0].getTipo() == Operando.VARIABLE){
-				String name = (String)opd[0].getValor();
+				String name = (String)((Variable)opd[0].getValor()).getName();
 				if(validVariableName(name) && opd.length == 2){
-					aux = new Operando[opd.length -1];
-					for (int i = 0; i < aux.length; i++) {
-						aux[i] = (Operando) asignarValores(opd[i], this.contexto, lo);
+					aux = new Operando[opd.length];
+					aux[0] = opd[0];
+					for (int i = 1; i < aux.length; i++) {
+						aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
 					}
 					Variable var = new Variable(name);
-					Object valor = aux[0].getValor();
+					Object valor = aux[1].getValor();
 					try {
 						var.setValor(valor);
+						op.getResultado().setValor(valor);
 					} catch (VariableException e) {
 						throw new InterpreteException(e.getMessage());
 					}
 					this.contexto.addVariable(var);
-					ret = ret + name + "\t=\t" + valor + "\n";
+					ret = ret + name + "\t=\t" + valor;
 				}else{
 					throw new InterpreteException("Not valid variable name");
 				}
@@ -436,10 +436,10 @@ public class MathInterprete {
 			aux = new Operando[opd.length];
 			for (int i = 0; i < opd.length; i++) {
 				//Asignamos de verdad los valores para no tener que castear manualmente
-				aux[i] = (Operando) asignarValores(opd[i], this.contexto, lo);
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
 			}
 			try {
-				Operador.suma(aux[0], aux[1]);
+				op.getResultado().setValor(Operador.suma(aux[0], aux[1]));
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
 			}
@@ -450,10 +450,24 @@ public class MathInterprete {
 			aux = new Operando[opd.length];
 			for (int i = 0; i < opd.length; i++) {
 				//Asignamos de verdad los valores para no tener que castear manualmente
-				aux[i] = (Operando) asignarValores(opd[i], this.contexto, lo);
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
 			}
 			try {
-				Operador.multiplicacion(aux[0], aux[1]);
+				op.getResultado().setValor(Operador.multiplicacion(aux[0], aux[1]));
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.EJECUTAR_FUNCION:
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			aux[0] = opd[0];
+			for (int i = 1; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+			}
+			try {
+				op.getResultado().setValor(Operador.ejecutarFuncion(aux, this.contexto));
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
 			}
@@ -480,13 +494,18 @@ public class MathInterprete {
 		ListaOperaciones lo = ei.getListaOperaciones();
 		int size = lo.size();
 		Operacion op = null;
+		boolean returnNull = false;
 		for (int i = 0; i < size; i++) {
 			op = lo.get(i);
 			ret = ret + realizarOperacion(op, lo);
 			if(op.getOperador() == Operador.CIERRE_LINEA){
 				//Si la ultima operacion es el cierre de linea entonces no escribimos nada por pantalla
-				ret = "";
+				returnNull = true;
 			}
+			
+		}
+		if(returnNull){
+			ret = "";
 		}
 		return ret;
 	}
@@ -695,7 +714,7 @@ public class MathInterprete {
 	 * @return
 	 */
 	public static boolean validVariableName(String txt){
-		return txt.matches("^[a-zA-Z][a-zA-Z0-9]*$");
+		return txt.matches("^[a-zA-Z][a-zA-Z0-9]*$") && !txt.equals("i") && !txt.equals("j");
 	}
 	public static boolean hasMoreLevels(String txt){
 		//Cada uno de estos separadores corresponde a una operacion matematica o expresion para acceder a funciones matrices o objetos
@@ -766,13 +785,15 @@ public class MathInterprete {
 	private Object asignarValores(Operando op,ContextoMatematico mc,ListaOperaciones lo) throws InterpreteException{
 		switch (op.getTipo()) {
 		case Operando.VARIABLE:
-			return mc.findVariableByName((String)op.getValor()).getValue();
+			return mc.findVariableByName(((Variable)op.getValor()).getName());
 		case Operando.RESULTADO:
 			return lo.get(((Integer)op.getValor()).intValue()).getResultado().getValor();
 		case Operando.VALOR_NUMERICO:
 			return op.getValor();
 		case Operando.MATRIZ:
 			return op.getValor();
+		case Operando.FUNCION:
+			return op;
 		default:
 			return op.getValor();
 		}

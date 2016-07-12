@@ -39,6 +39,17 @@ public class ValorNumericoException extends Exception{
 		}
 		return ret;
 	}
+	public static String generarNotSupported(String ops){
+		String[] vec = ((String) codigos.get(4)).split(SPLITER);
+		String ret = "";
+		for (int i = 0; i < vec.length; i++) {
+			if(i == 1){
+				ret = ret + ops;
+			}
+			ret = ret + vec[i];
+		}
+		return ret;
+	}
 	public static String generarErrorDenominadorNulo(){
 		return (String)codigos.get(1);
 	}
@@ -47,6 +58,7 @@ public class ValorNumericoException extends Exception{
 		map.put(1, "Cant divide by 0 ");
 		map.put(2, "Cant add " + SPLITER);
 		map.put(3, "Cant multiply " + SPLITER);
+		map.put(4, "Operation " + SPLITER + " not supported yet");
 		return map;
 	}
 }

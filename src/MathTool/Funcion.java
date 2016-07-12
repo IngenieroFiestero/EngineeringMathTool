@@ -6,6 +6,7 @@ public class Funcion {
 	private String[] args;
 	private String[] out;
 	private boolean estatico;
+	private int id = -1;
 	
 	public Funcion(String name){
 		this.name = name;
@@ -35,6 +36,7 @@ public class Funcion {
 	public Funcion(String name,int id){
 		this.name = name;
 		this.estatico = true;
+		this.id = id;
 	}
 	/**
 	 * Devulve el nombre de la funcion
@@ -63,5 +65,14 @@ public class Funcion {
 	 */
 	public String[] geOuts(){
 		return this.out;
+	}
+	public boolean isStatic(){
+		return this.estatico;
+	}
+	public int getId(){
+		return this.id;
+	}
+	public String toString(){
+		return this.name;
 	}
 }

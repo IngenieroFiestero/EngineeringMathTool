@@ -1,6 +1,7 @@
 package Operaciones;
 
 import MathTool.Funcion;
+import MathTool.FuncionUtils;
 import MathTool.GestorScript;
 import MathTool.InterpreteException;
 import MathTool.InterpreteScript;
@@ -83,28 +84,33 @@ public class Operador {
 			return null;
 		}
 	}
-	public static Object evaluacion(Operando op1,MathInterprete mi) throws VariableException, InterpreteException{
+	public static Object evaluacion(Operando op1,ContextoMatematico mc) throws VariableException, InterpreteException{
 		if(op1.getTipo() == Operando.VARIABLE){
-			return mi.getMathContext().findVariableByName(((Variable)op1.getValor()).getName()).getValue();
+			return mc.findVariableByName(((Variable)op1.getValor()).getName()).getValue();
 		}else{
 			throw new VariableException("Not valid");
 		}
 	}
-	public static Object ejecutarFuncion(Operando[] ops,MathInterprete mi) throws VariableException, InterpreteException{
+	public static Object ejecutarFuncion(Operando[] ops,ContextoMatematico mc) throws VariableException, InterpreteException{
 		if(ops.length >= 1){
 			if(ops[0].getTipo() == Operando.FUNCION){
 				Funcion fun = null;
-				if((fun = mi.getMathContext().findFuncionByName(((Funcion)ops[0].getValor()).getName())) != null){
-					ContextoMatematico mc = new ContextoMatematico();
+				if((fun = mc.findFuncionByName(((Funcion)ops[0].getValor()).getName())) != null){
+					if(fun.isStatic()){
+						return FuncionUtils.ejecutar(fun.getId(), ops);
+					}
+					/*
+					ContextoMatematico mcAux = new ContextoMatematico();
 					String[] args = null;
 					if(ops.length-1 > (args = fun.getArgs()).length){
 						throw new InterpreteException("Excess of function arguments");
 					}
 					//Añadir las variables al contexto para que la funcion pueda ejecutarse
 					for (int i = 1; i < ops.length; i++) {
-						mc.addVariable(new Variable(args[i-1],ops[i]));
-					}
+						mcAux.addVariable(new Variable(args[i-1],ops[i]));
+					}*/
 					//Ejecutar script:
+					
 				}else{
 					throw new InterpreteException("Cant find function in context");
 				}

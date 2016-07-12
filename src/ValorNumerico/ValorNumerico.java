@@ -28,7 +28,7 @@ public class ValorNumerico implements Cloneable,Serializable {
 	public static final ValorNumerico ZERO = new ValorNumerico(0.0, 0.0);
 	public static final ValorNumerico E = new ValorNumerico(Math.E);
 	public static final ValorNumerico PI = new ValorNumerico(Math.PI);
-
+	public static final String[] SIGNOS = new String[] {"-","" ,"+"};
 	public ValorNumerico(double real) {
 		this(real, 0.0);
 	}
@@ -55,25 +55,28 @@ public class ValorNumerico implements Cloneable,Serializable {
 			if (isNumber(valores[i])) {
 				numeros.add(new Integer(i));
 			}else if(valores[i].equals("i") || valores[i].equals("+") || valores[i].equals("-") || valores[i].equals(" ")){
-				
 			}else{
 				valid = false;
 			}
 		}
-		for (int i = 0; i < numeros.size(); i++) {
-			int pos = numeros.get(i);
-			if ((pos + 1) < valores.length && valores[pos + 1].equals(IMAGINARIO)) {
-				// HEMOS ENCONTRADO EL NUMERO IMAGINARIO
-				if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
-					imagin = Double.parseDouble(valores[pos - 1] + valores[pos]);
-				} else {
-					imagin = Double.parseDouble(valores[pos]);
-				}
-			} else {
-				if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
-					real = Double.parseDouble(valores[pos - 1] + valores[pos]);
-				} else {
-					real = Double.parseDouble(valores[pos]);
+		if(valores.length == 1 && valores[0].equals("i")){
+			imagin = 1;
+		}else{
+			for (int i = 0; i < numeros.size(); i++) {
+				int pos = numeros.get(i);
+				if ((pos + 1) < valores.length && valores[pos + 1].equals(IMAGINARIO)) {
+					// HEMOS ENCONTRADO EL NUMERO IMAGINARIO
+					if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
+						imagin = Double.parseDouble(valores[pos - 1] + valores[pos]);
+					} else {
+						imagin = Double.parseDouble(valores[pos]);
+					}
+				}else {
+					if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
+						real = Double.parseDouble(valores[pos - 1] + valores[pos]);
+					} else {
+						real = Double.parseDouble(valores[pos]);
+					}
 				}
 			}
 		}
@@ -87,10 +90,12 @@ public class ValorNumerico implements Cloneable,Serializable {
 	public String toString() {
 		if (this.imaginario.doubleValue() == 0) {
 			return this.real.toString();
-		} else if (this.real.doubleValue() == 0) {
-			return this.imaginario.toString();
+		} else if (this.real.doubleValue() == 0 && this.imaginario.doubleValue() == 1) {
+			return "i";
+		}else if(this.real.doubleValue() == 0){
+			return this.imaginario.toString() + "i";
 		} else {
-			return this.real.toString() + " " + this.imaginario.toString() + "i";
+			return SIGNOS[this.real.signum()+1]+this.real.toString() + " " +SIGNOS[this.imaginario.signum()+1]+ this.imaginario.toString() + "i";
 		}
 	}
 
@@ -300,5 +305,15 @@ public class ValorNumerico implements Cloneable,Serializable {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.save(baos);
 		return baos.toByteArray();
+	}
+	public ValorNumerico sqrt() throws ValorNumericoException{
+		if(imaginario.compareTo(BigDecimal.ZERO) != 0){
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sqrt()"));
+		}
+		return new ValorNumerico(sqrt(real));
+	}
+	private static BigDecimal sqrt(BigDecimal value) {
+		BigDecimal x = new BigDecimal(Math.sqrt(value.doubleValue()));
+	    return x.add(new BigDecimal(value.subtract(x.multiply(x)).doubleValue() / (x.doubleValue() * 2.0)));
 	}
 }

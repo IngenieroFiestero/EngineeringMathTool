@@ -44,8 +44,7 @@ public class Operando {
 		}else if(operando instanceof String){
 			String txt = (String)operando;
 			try {
-				ValorNumerico val = new ValorNumerico(txt);
-				this.operando = val;
+				this.operando = new ValorNumerico(txt);
 				this.tipo = VALOR_NUMERICO;
 			} catch (ValorNumericoException e) {
 				try {

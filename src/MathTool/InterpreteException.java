@@ -36,6 +36,12 @@ public class InterpreteException extends Exception{
 		String ret = vec[0]+name;
 		return ret;
 	}
+	public static String generateCantFindFunctionError(String name){
+		String algo = (String) codigos.get(2);
+		String[] vec = algo.split(SPLITER);
+		String ret = vec[0]+name;
+		return ret;
+	}
 	public static String generateAlredyExistsError(String name){
 		String algo = (String) codigos.get(1);
 		String[] vec = algo.split(SPLITER);

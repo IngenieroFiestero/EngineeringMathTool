@@ -19,7 +19,7 @@ public class ContextoMatematico implements Serializable{
 	
 	public ContextoMatematico(){
 		this.variableList = ListaVariables.listaPorDefecto();
-		this.funcionList = new ListaFunciones();
+		this.funcionList = ListaFunciones.listaPorDefecto();
 		this.scriptList = new ListaScripts();
 		MATH_CONTEXT = new MathContext(MathContext.UNLIMITED.getPrecision(),RoundingMode.HALF_EVEN);
 	}
