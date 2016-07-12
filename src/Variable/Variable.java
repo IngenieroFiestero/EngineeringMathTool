@@ -12,25 +12,34 @@ import Matriz.Matriz;
 import ValorNumerico.ValorNumerico;
 
 public class Variable {
-	
+	private boolean estatico;
 	private String name;
 	private transient Object valor;
 	
 	public Variable(String name){
 		this.name = name;
 		this.valor = null;
+		this.estatico = false;
 	}
 	public Variable(String name,ValorNumerico val){
 		this.name = name;
 		this.valor = val;
+		this.estatico = false;
 	}
 	public Variable(String name,Matriz val){
 		this.name = name;
 		this.valor = val;
+		this.estatico = false;
 	}
 	public Variable(String name,Object val){
 		this.name = name;
 		this.valor = val;
+		this.estatico = false;
+	}
+	public Variable(String name,Object val,boolean estatico){
+		this.name = name;
+		this.valor = val;
+		this.estatico = estatico;
 	}
 	public String getName(){
 		return this.name;
@@ -41,8 +50,12 @@ public class Variable {
 	public String toString(){
 		return this.name;
 	}
-	public void setValor(Object valor){
-		this.valor = valor;
+	public void setValor(Object valor) throws VariableException{
+		if(this.estatico){
+			throw new VariableException("Cant modifie a static variable");
+		}else{
+			this.valor = valor;
+		}
 	}
 	public static Variable load(InputStream is) throws IOException{
 		DataInputStream dis = new DataInputStream(is);

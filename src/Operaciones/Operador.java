@@ -4,7 +4,7 @@ import MathTool.Funcion;
 import MathTool.GestorScript;
 import MathTool.InterpreteException;
 import MathTool.InterpreteScript;
-import MathTool.MathContext;
+import MathTool.ContextoMatematico;
 import MathTool.MathInterprete;
 import Matriz.Matriz;
 import Matriz.MatrizException;
@@ -44,7 +44,33 @@ public class Operador {
 			return null;
 		}
 	}
+	public static Object resta(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{
+		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
+			return (((ValorNumerico)op1.getValor()).negate().add((ValorNumerico)op2.getValor()));
+		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
+			return (((Matriz)op1.getValor()).sumar((Matriz)op2.getValor()));
+		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
+			return (new Matriz((ValorNumerico)op1.getValor())).restar((Matriz)op2.getValor());
+		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
+			return (new Matriz((ValorNumerico)op2.getValor())).restar((Matriz)op1.getValor());
+		}else{
+			return null;
+		}
+	}
 	public static Object multiplicacion(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{
+		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
+			return (((ValorNumerico)op1.getValor()).multiply((ValorNumerico)op2.getValor()));
+		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
+			return (((Matriz)op1.getValor()).multiplicar((Matriz)op2.getValor()));
+		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
+			return (new Matriz((ValorNumerico)op1.getValor())).multiplicar((Matriz)op2.getValor());
+		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
+			return (new Matriz((ValorNumerico)op2.getValor())).multiplicar((Matriz)op1.getValor());
+		}else{
+			return null;
+		}
+	}
+	public static Object modulo(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{
 		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
 			return (((ValorNumerico)op1.getValor()).multiply((ValorNumerico)op2.getValor()));
 		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
@@ -69,7 +95,7 @@ public class Operador {
 			if(ops[0].getTipo() == Operando.FUNCION){
 				Funcion fun = null;
 				if((fun = mi.getMathContext().findFuncionByName(((Funcion)ops[0].getValor()).getName())) != null){
-					MathContext mc = new MathContext();
+					ContextoMatematico mc = new ContextoMatematico();
 					String[] args = null;
 					if(ops.length-1 > (args = fun.getArgs()).length){
 						throw new InterpreteException("Excess of function arguments");

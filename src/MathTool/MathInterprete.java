@@ -16,6 +16,7 @@ import Operaciones.Operando;
 import Operaciones.Resultado;
 import ValorNumerico.ValorNumericoException;
 import Variable.Variable;
+import Variable.VariableException;
 
 public class MathInterprete {
 	public static final int ASIGNACION = 0;
@@ -43,35 +44,24 @@ public class MathInterprete {
 		FUNCION, SCRIPT, ASIGNACION, EVALUACION
 	};
 
-	private MathContext contexto;
+	private ContextoMatematico contexto;
 
 	// Si no se ha usado nunca
 	public MathInterprete() {
-		contexto = new MathContext();
+		contexto = new ContextoMatematico();
 	}
 
 	// Si ya se ha usado y hay un contexto se puede cargar
-	public MathInterprete(MathContext contexto) {
+	public MathInterprete(ContextoMatematico contexto) {
 		this.contexto = contexto;
 	}
-	/**
-	 * Ejemplo Codigos:<br>
-	 * FUNCION<br>
-	 * function [err,res1,res2] = miFuncion1(param1,param2)<br>
-	 * 	res1=param1;<br>
-	 * 	res2=param2;<br>
-	 * end<br>
-	 * EVALUACION<br>
-	 * 8*2<br>
-	 * ASIGNACION<br>
-	 * val1=5*3+2*8+miFuncion1(1,2);<br>
-	 * @param txt
-	 * @return
-	 * @throws InterpreteException 
-	 */
-	public Object evaluarExpresion(String txt, Executor exec){
-		
-		return txt;
+	
+	public ExpresionInterpretada evaluarExpresion(String txt) throws InterpreteException{
+		ExpresionInterpretada ret = new ExpresionInterpretada(txt);
+		ListaOperaciones ops = new ListaOperaciones();
+		getOperacion(txt,ops);
+		ret.setListaOperaciones(ops);
+		return ret;
 	}
 	/**
 	 * Obtiene la ultima operacion de la cadena de texto
@@ -215,8 +205,21 @@ public class MathInterprete {
 							return op;
 						}
 					}else if(lvl == 2){
+						System.out.println("Elevando o modulo");
 						split = spliterEspecial(txt, new char[]{'%','^'});
-						lvl++;
+						if(split.length == 1){
+							lvl++;
+						}else if(split.length >= 3){
+							if(split[1].equals("%")){
+								
+							}else if(split[1].equals("^")){
+								
+							}else{
+								throw new InterpreteException("Not valid argument");
+							}
+						}else{
+							throw new InterpreteException("Not enough arguments for % or ^");
+						}
 					}else if(lvl == 3){
 						split = spliterEspecial(txt, new char[]{'\''});
 						lvl++;
@@ -413,7 +416,11 @@ public class MathInterprete {
 					}
 					Variable var = new Variable(name);
 					Object valor = aux[0].getValor();
-					var.setValor(valor);
+					try {
+						var.setValor(valor);
+					} catch (VariableException e) {
+						throw new InterpreteException(e.getMessage());
+					}
 					this.contexto.addVariable(var);
 					ret = ret + name + "\t=\t" + valor + "\n";
 				}else{
@@ -529,10 +536,10 @@ public class MathInterprete {
 	public Funcion getFuncionByName(String name) throws InterpreteException{
 		return contexto.findFuncionByName(name);
 	}
-	public MathContext getMathContext(){
+	public ContextoMatematico getMathContext(){
 		return this.contexto;
 	}
-	public void setMathContext(MathContext mc){
+	public void setMathContext(ContextoMatematico mc){
 		this.contexto = mc;
 	}
 	/**
@@ -756,7 +763,7 @@ public class MathInterprete {
 	 * @return
 	 * @throws InterpreteException
 	 */
-	private Object asignarValores(Operando op,MathContext mc,ListaOperaciones lo) throws InterpreteException{
+	private Object asignarValores(Operando op,ContextoMatematico mc,ListaOperaciones lo) throws InterpreteException{
 		switch (op.getTipo()) {
 		case Operando.VARIABLE:
 			return mc.findVariableByName((String)op.getValor()).getValue();

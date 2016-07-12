@@ -196,6 +196,21 @@ public class Matriz implements  Cloneable{
 			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
 	}
+	public Matriz restar(Matriz mat) throws MatrizException, ValorNumericoException {
+		int[] dim1 = this.dimensions();
+		int[] dim2 = mat.dimensions();
+		Matriz ret = new Matriz(dim1);
+		if (Arrays.equals(dim1, dim2)) {
+			for (int i = 0; i < dim1[0]; i++) {
+				for (int j = 0; j < dim1[1]; j++) {
+					ret.set(new int[] { i, j },matriz[i][j].substract(mat.get(new int[] { i, j })));
+				}
+			}
+			return ret;
+		} else {
+			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
+		}
+	}
 	/**
 	 * No existen las divisiones, solo la multiplicaci��n por el inverso para poder trabajar de igual forma con matrices
 	 * @return

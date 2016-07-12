@@ -1,6 +1,7 @@
 package MathTool;
 import java.util.ArrayList;
 
+import ValorNumerico.ValorNumerico;
 import Variable.Variable;
 /**
  * Lista de variables
@@ -9,6 +10,7 @@ import Variable.Variable;
  */
 public class ListaVariables {
 	ArrayList<Variable> variableList = new ArrayList<Variable>();
+	
 	public ListaVariables(ArrayList<Variable> lista){
 		this.variableList = lista;
 	}
@@ -39,7 +41,11 @@ public class ListaVariables {
 	 */
 	public static ListaVariables listaPorDefecto(){
 		ArrayList<Variable> lista = new ArrayList<Variable>();
+		lista.add(new Variable("e",ValorNumerico.E,true));
+		lista.add(new Variable("pi",ValorNumerico.PI,true));
 		return new ListaVariables(lista);
-		
+	}
+	public Variable[] getVariables(){
+		return variableList.toArray(new Variable[variableList.size()]);
 	}
 }

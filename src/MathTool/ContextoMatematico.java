@@ -3,28 +3,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import Variable.Variable;
 
-public class MathContext implements Serializable{
+public class ContextoMatematico implements Serializable{
 	private static final long serialVersionUID = -8069695659613918920L;
 	
 	private ListaVariables variableList;
 	private ListaFunciones funcionList;
 	private ListaScripts scriptList;
+	public static MathContext MATH_CONTEXT = new MathContext(MathContext.UNLIMITED.getPrecision(),RoundingMode.UP);
 	
-	public MathContext(){
+	public ContextoMatematico(){
 		this.variableList = ListaVariables.listaPorDefecto();
 		this.funcionList = new ListaFunciones();
 		this.scriptList = new ListaScripts();
+		MATH_CONTEXT = new MathContext(MathContext.UNLIMITED.getPrecision(),RoundingMode.HALF_EVEN);
 	}
 	/**
 	 * Contexto matematico, contiene las funciones y variables que usar el interprete para poder
 	 * Dar valores a las expresiones y clasificar las expresiones. Es serializable con lo cual se 
 	 * puede guardar para poder asi trabajar con diferentes espacios de trabajo.
 	 */
-	public MathContext(ListaVariables variableList,ListaFunciones funcionList,ListaScripts scriptList){
+	public ContextoMatematico(ListaVariables variableList,ListaFunciones funcionList,ListaScripts scriptList){
 		this.variableList = variableList;
 		this.funcionList = funcionList;
 		this.scriptList = scriptList;
@@ -38,9 +42,9 @@ public class MathContext implements Serializable{
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
-	public static MathContext loadMathContext(InputStream is) throws IOException, ClassNotFoundException{
+	public static ContextoMatematico loadMathContext(InputStream is) throws IOException, ClassNotFoundException{
 		ObjectInputStream ois = new ObjectInputStream(is);
-		MathContext ret = (MathContext) ois.readObject();
+		ContextoMatematico ret = (ContextoMatematico) ois.readObject();
 		return ret;
 	}
 	/**
@@ -97,6 +101,9 @@ public class MathContext implements Serializable{
 	}
 	public void addFuncion(Funcion fun){
 		funcionList.addFuncion(fun);
+	}
+	public ListaVariables getVariableList(){
+		return this.variableList;
 	}
 
 }

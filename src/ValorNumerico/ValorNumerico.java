@@ -6,45 +6,45 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import MathTool.ContextoMatematico;
+import MathTool.MathInterprete;
 import MathTool.MathSerialize;
 import Variable.Variable;
 
 public class ValorNumerico implements Cloneable,Serializable {
 	private static final long serialVersionUID = -2942022796658879818L;
-	private double real;
-	private double imaginario;
-	private double divisor;
+	private BigDecimal real;
+	private BigDecimal imaginario;
 	public static final String IMAGINARIO = "i";
 	public static final String[] TOKENS = new String[] { " ", "+", "-", "i" };
 	public static final ValorNumerico I = new ValorNumerico(0.0, 1.0);
-	public static final ValorNumerico NaN = new ValorNumerico(Double.NaN, Double.NaN);
-	public static final ValorNumerico INF = new ValorNumerico(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 	public static final ValorNumerico ONE = new ValorNumerico(1.0, 0.0);
 	public static final ValorNumerico ZERO = new ValorNumerico(0.0, 0.0);
-	private final transient boolean isNaN;
-	private final transient boolean isInfinite;
+	public static final ValorNumerico E = new ValorNumerico(Math.E);
+	public static final ValorNumerico PI = new ValorNumerico(Math.PI);
 
 	public ValorNumerico(double real) {
 		this(real, 0.0);
 	}
 
 	public ValorNumerico(double real, double imaginario) {
+		this.real = new BigDecimal(real,ContextoMatematico.MATH_CONTEXT);
+		this.imaginario = new BigDecimal(imaginario,ContextoMatematico.MATH_CONTEXT);
+	}
+	public ValorNumerico(BigDecimal real) {
+		this.real = real;
+		this.imaginario = BigDecimal.ZERO;
+	}
+	public ValorNumerico(BigDecimal real, BigDecimal imaginario) {
 		this.real = real;
 		this.imaginario = imaginario;
-		this.divisor = 1;
-		isNaN = Double.isNaN(real) || Double.isNaN(imaginario);
-		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
 	}
-	public ValorNumerico(double real, double imaginario,double divisor) {
-		this.real = real;
-		this.imaginario = imaginario;
-		this.divisor = divisor;
-		isNaN = Double.isNaN(real) || Double.isNaN(imaginario);
-		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
-	}
-
 	public ValorNumerico(String numero) throws ValorNumericoException {
 		String[] valores = spliter(numero);
 		ArrayList<Integer> numeros = new ArrayList<Integer>();
@@ -80,122 +80,48 @@ public class ValorNumerico implements Cloneable,Serializable {
 		if(!valid){
 			throw new ValorNumericoException("Not Valid");
 		}
-		this.real = real;
-		this.imaginario = imagin;
-		this.divisor = 1;
-		isNaN = Double.isNaN(real) || Double.isNaN(imaginario);
-		isInfinite = !isNaN && (Double.isInfinite(real) || Double.isInfinite(imaginario));
+		this.real = new BigDecimal(real,ContextoMatematico.MATH_CONTEXT);
+		this.imaginario = new BigDecimal(imagin,ContextoMatematico.MATH_CONTEXT);
 	}
 
 	public String toString() {
-		if(this.divisor == 1){
-			if (this.imaginario == 0) {
-				return this.real + "";
-			} else if (this.real == 0) {
-				return this.imaginario + "i";
-			} else {
-				return this.real + " " + this.imaginario + "i";
-			}
-		}else{
-			if (this.imaginario == 0) {
-				return this.real/this.divisor + "";
-			} else if (this.real == 0) {
-				return this.imaginario/divisor + "i";
-			} else {
-				return this.real/this.divisor + " " + this.imaginario/divisor + "i";
-			}
+		if (this.imaginario.doubleValue() == 0) {
+			return this.real.toString();
+		} else if (this.real.doubleValue() == 0) {
+			return this.imaginario.toString();
+		} else {
+			return this.real.toString() + " " + this.imaginario.toString() + "i";
 		}
 	}
 
-	public double getReal() {
+	public BigDecimal getReal() {
 		return this.real;
 	}
 
-	public double getImaginario() {
+	public BigDecimal getImaginario() {
 		return this.imaginario;
 	}
 
-	public boolean isInfinite() {
-		return this.isInfinite;
-	}
-
-	public boolean isNaN() {
-		return this.isNaN;
-	}
-	public double getDivisor(){
-		return this.divisor;
-	}
-
 	public ValorNumerico add(ValorNumerico val) {
-		if (isNaN || val.isNaN()) {
-			return NaN;
-		} else {
-			if(divisor == 1 && val.getDivisor() == 1){
-				return new ValorNumerico(this.real + val.getReal(), this.imaginario + val.getImaginario(),this.divisor);
-			}else{
-				return new ValorNumerico(this.real + val.getReal(), this.imaginario + val.getImaginario(),this.divisor);
-			}
-		}
+		return new ValorNumerico(this.real.add(val.getReal()), this.imaginario.add(val.getImaginario()));
 	}
 
 	public ValorNumerico substract(ValorNumerico val) {
-		if (isNaN || val.isNaN()) {
-			return NaN;
-		} else {
-			if(divisor == 1 && val.getDivisor() == 1){
-				return new ValorNumerico(this.real - val.getReal(), this.imaginario + val.getImaginario(),this.divisor);
-			}else{
-				return new ValorNumerico(this.real*val.getDivisor() - val.getReal()*this.divisor, this.imaginario*val.getDivisor() - val.getImaginario()*this.divisor,this.divisor*val.divisor);
-			}
-		}
+		return new ValorNumerico(this.real.subtract(val.getReal()), this.imaginario.subtract(val.getImaginario()));
 	}
 
 	public ValorNumerico conjugate() {
-		if (isNaN) {
-			return NaN;
-		}
-		return new ValorNumerico(this.real, -this.imaginario,this.divisor);
+		return new ValorNumerico(this.real, this.imaginario.negate());
 	}
 
 	public ValorNumerico divide(ValorNumerico divisor) throws ValorNumericoException {
 		checkNotNull(divisor);
-		if (isNaN || divisor.isNaN) {
-			return NaN;
-		}
-		if(this.divisor == 1 && divisor.getDivisor() == 1){
-			final double c = divisor.getReal();
-			final double d = divisor.getImaginario();
-			if (c == 0.0 && d == 0.0) {
-				return NaN;
-			}
-
-			if (divisor.isInfinite() && !isInfinite()) {
-				return ZERO;
-			}
-			if (c == 0.0 && d == 0.0) {
-				return NaN;
-			}
-			if (divisor.isInfinite() && !isInfinite()) {
-				return ZERO;
-			}
-			return new ValorNumerico((this.real*divisor.getReal()-this.imaginario*divisor.getImaginario()),
-					(this.real*divisor.getImaginario()+this.imaginario*divisor.getReal()),
-					(divisor.getReal()*divisor.getReal()+divisor.getImaginario()*divisor.getImaginario()));
-
-		}else{
-			final double c = divisor.getReal()*this.getDivisor();
-			final double d = divisor.getImaginario()*this.getDivisor();
-			if (c == 0.0 && d == 0.0) {
-				return NaN;
-			}
-			if (divisor.isInfinite() && !isInfinite()) {
-				return ZERO;
-			}
-			return new ValorNumerico(divisor.getDivisor()*(this.real*divisor.getReal()-this.imaginario*divisor.getImaginario()),
-					divisor.getDivisor()*(this.real*divisor.getImaginario()+this.imaginario*divisor.getReal()),
-					this.divisor*(divisor.getReal()*divisor.getReal()+divisor.getImaginario()*divisor.getImaginario()));
-		}
-		
+		BigDecimal denominador = (divisor.getReal().multiply(divisor.getReal())
+				.add(divisor.getImaginario().multiply(divisor.getImaginario())));
+		return new ValorNumerico((this.real.multiply(divisor.getReal())
+				.add(this.imaginario.multiply(divisor.getImaginario()))).divide(denominador),
+				(this.real.multiply(divisor.getImaginario())
+						.add(this.imaginario.multiply(divisor.getReal()))).divide(denominador));
 	}
 
 	@Override
@@ -205,47 +131,30 @@ public class ValorNumerico implements Cloneable,Serializable {
 		}
 		if (other instanceof ValorNumerico) {
 			ValorNumerico c = (ValorNumerico) other;
-			if (c.isNaN) {
-				return isNaN;
-			} else {
-				return new Double(real).equals(new Double(c.getReal()))
-						&& new Double(imaginario).equals(new Double(c.getImaginario()))
-						&& new Double(divisor).equals(new Double(c.getDivisor()));
-			}
+			return ((BigDecimal)((ValorNumerico)other).getReal()).compareTo(this.real) == 0 &&
+					((BigDecimal)((ValorNumerico)other).getImaginario()).compareTo(this.imaginario) == 0;
 		}
 		return false;
 	}
 
 	public ValorNumerico multiply(ValorNumerico factor) throws ValorNumericoException {
 		checkNotNull(factor);
-		if (isNaN || factor.isNaN) {
-			return NaN;
-		}
-		if (Double.isInfinite(real) || Double.isInfinite(imaginario) || Double.isInfinite(factor.real)
-				|| Double.isInfinite(factor.imaginario)) {
-			return INF;
-		}
-		return new ValorNumerico(real * factor.real - imaginario * factor.imaginario,
-				real * factor.imaginario + imaginario * factor.real,
-				divisor*factor.divisor);
+		return new ValorNumerico(real.multiply(factor.getReal()).subtract(imaginario.multiply(factor.getImaginario())),
+				real.multiply(factor.getImaginario()).add(imaginario.multiply(factor.getReal())));
 	}
 	public Object clone(){
 		return new ValorNumerico(this.real,this.imaginario);
 	}
 	public ValorNumerico negate() {
-		if (isNaN) {
-			return NaN;
-		}
-
-		return new ValorNumerico(-real, -imaginario);
+		return new ValorNumerico(real.negate(), imaginario.negate());
 	}
 	public void setRand(){
-		this.real = Math.random();
-		this.imaginario = Math.random();
+		this.real = new BigDecimal(Math.random(),ContextoMatematico.MATH_CONTEXT);
+		this.imaginario = new BigDecimal(Math.random(),ContextoMatematico.MATH_CONTEXT);
 	}
 	public void setNull(){
-		this.real = 0;
-		this.imaginario = 0;
+		this.real = BigDecimal.ZERO;
+		this.imaginario = BigDecimal.ZERO;
 	}
 
 	public static boolean isSign(String sign) {
@@ -307,6 +216,42 @@ public class ValorNumerico implements Cloneable,Serializable {
 
 		return ret;
 	}
+	public ValorNumerico modulo(ValorNumerico val) throws ValorNumericoException{
+		if(val.getImaginario().compareTo(BigDecimal.ZERO) != 0 || imaginario.compareTo(BigDecimal.ZERO) != 0){
+			throw new ValorNumericoException("Arguments must be real");
+		}else{
+			BigDecimal rem = this.real.divideToIntegralValue(val.getReal());
+			return new ValorNumerico(returnAproxNumber(this.real.subtract(rem.multiply(val.getReal()))));
+		}
+	}
+	/**
+	 * Recorre la cadena y elimina zeros de gratis. Es muy lento hay que buscar una forma mejor o utilizarlo en el ContextoMatematico
+	 * @param bd
+	 * @return
+	 */
+	private BigDecimal returnAproxNumber(BigDecimal bd){
+		String cadena = bd.toString();
+		int firstZero = 0;
+		int lastZero = 0;
+		int count = 0;
+		int lengthMin = Math.max((int) (cadena.length()*0.05),1);
+		for (int i = 0; i < cadena.length(); i++) {
+			if(cadena.charAt(i) == '0'){
+				if(count == 0){
+					firstZero = i;
+				}
+				count++;
+			}else{
+				if(count >= lengthMin){
+					lastZero = i+1;
+					return new BigDecimal(cadena.substring(0,firstZero));
+				}else{
+					count = 0;
+				}
+			}
+		}
+		return bd;
+	}
 	/**
 	 * Utilidad para trabajar con divisores, puesto que una de las variables que se guardan son los divisores
 	 * @param num
@@ -326,7 +271,12 @@ public class ValorNumerico implements Cloneable,Serializable {
 		}
         return list;
 	}
-
+	public int compareTo(ValorNumerico val){
+		return absolute().compareTo(val.absolute());
+	}
+	public BigDecimal absolute(){
+		return new BigDecimal(Math.sqrt(real.multiply(real).add(imaginario.multiply(imaginario)).doubleValue()),ContextoMatematico.MATH_CONTEXT);
+	}
 	public static void checkNotNull(ValorNumerico val) throws ValorNumericoException {
 		if (val.equals(ValorNumerico.ZERO)) {
 			throw new ValorNumericoException(ValorNumericoException.generarErrorDenominadorNulo());
@@ -334,18 +284,16 @@ public class ValorNumerico implements Cloneable,Serializable {
 	}
 	public static ValorNumerico load(InputStream is) throws IOException{
 		DataInputStream dis = new DataInputStream(is);
-		double real = dis.readDouble();
-		double imaginario = dis.readDouble();
-		double divisor = dis.readDouble();
+		BigDecimal real = new BigDecimal(dis.readUTF(),ContextoMatematico.MATH_CONTEXT);
+		BigDecimal imaginario = new BigDecimal(dis.readUTF(),ContextoMatematico.MATH_CONTEXT);
 		dis.close();
-		return new ValorNumerico(real,imaginario,divisor);
+		return new ValorNumerico(real,imaginario);
 	}
 	public void save(OutputStream os) throws IOException{
 		DataOutputStream dos = new DataOutputStream(os);
 		//Escribir primero el tipo de informacion que vamos a almacenar
-		dos.writeDouble(this.real);
-		dos.writeDouble(this.imaginario);
-		dos.writeDouble(this.divisor);
+		dos.writeUTF(real.toString());
+		dos.writeUTF(imaginario.toString());
 		dos.close();//Siempre mandar la informacion directamente al OutputStream al acabar
 	}
 	public byte[] getBytes() throws IOException{

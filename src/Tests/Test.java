@@ -6,14 +6,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import MathTool.InterpreteException;
+import MathTool.ListaVariables;
 import MathTool.MathInterprete;
 import Matriz.Matriz;
 import Matriz.MatrizException;
+import Operaciones.ExpresionInterpretada;
 import Operaciones.ListaOperaciones;
 import Operaciones.Operacion;
 import Operaciones.Operador;
 import Operaciones.Operando;
 import ValorNumerico.*;
+import Variable.Variable;
 
 
 public class Test {
@@ -22,7 +25,7 @@ public class Test {
 		Matriz matP = new Matriz("[2]");
 		System.out.println(matP.toString());
 		System.out.println("----------------------------------");
-		ValorNumerico val = new ValorNumerico(15,12,3);
+		ValorNumerico val = new ValorNumerico(15,12);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		ByteArrayInputStream is = null;
 		ValorNumerico val2 = null;
@@ -69,8 +72,9 @@ public class Test {
 		System.out.println("----------------------------------");
 		ListaOperaciones ops = new ListaOperaciones();
 		try {
-			Operacion operac = mi.getOperacion("[a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);", ops);
-			
+			//Operacion operac = mi.getOperacion("[a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);", ops);
+			ExpresionInterpretada ei = mi.evaluarExpresion("[a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);");
+			ops=ei.getListaOperaciones();
 		} catch (InterpreteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -84,7 +88,20 @@ public class Test {
 			for (int j = 0; j < oper.length; j++) {
 				System.out.println(oper[j]);
 			}
-			
+		}
+		System.out.println("---------------- Modulo ------------------");
+		try {
+			ValorNumerico val11 = new ValorNumerico("5.2");
+			ValorNumerico val22 = new ValorNumerico("5");
+			System.out.println("Modulo " + val11.modulo(val22));
+		} catch (ValorNumericoException e) {
+		}
+		
+		System.out.println("---------------- Lista Variables ------------------");
+		ListaVariables lv = mi.getMathContext().getVariableList();
+		Variable[] list = lv.getVariables();
+		for (int i = 0; i < list.length; i++) {
+			System.out.println(list[i] + " " + list[i].getValue());
 		}
 	}
 

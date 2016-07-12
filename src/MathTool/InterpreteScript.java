@@ -15,7 +15,7 @@ public class InterpreteScript implements Runnable{
 	 * @param exec
 	 * @throws InterpreteException
 	 */
-	public InterpreteScript(Script sc,MathContext mc,Executor exec) throws InterpreteException{
+	public InterpreteScript(Script sc,ContextoMatematico mc,Executor exec) throws InterpreteException{
 		this.mi = new MathInterprete(mc);
 		this.sc = sc;
 		gs =  new GestorScript(sc);
