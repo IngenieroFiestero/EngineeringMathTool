@@ -28,7 +28,7 @@ public class ValorNumerico implements Cloneable,Serializable {
 	public static final ValorNumerico ZERO = new ValorNumerico(0.0, 0.0);
 	public static final ValorNumerico E = new ValorNumerico(Math.E);
 	public static final ValorNumerico PI = new ValorNumerico(Math.PI);
-	public static final String[] SIGNOS = new String[] {"-","" ,"+"};
+	public static final String[] SIGNOS = new String[] {"","" ,"+"};
 	public ValorNumerico(double real) {
 		this(real, 0.0);
 	}
@@ -310,7 +310,14 @@ public class ValorNumerico implements Cloneable,Serializable {
 		if(imaginario.compareTo(BigDecimal.ZERO) != 0){
 			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sqrt()"));
 		}
-		return new ValorNumerico(sqrt(real));
+		if(real.compareTo(BigDecimal.ZERO) == 1){
+			return new ValorNumerico(sqrt(real));
+		}else if(real.compareTo(BigDecimal.ZERO) == -1){
+			//Si el real es negativo entonces la raiz cuadrada es compleja
+			return new ValorNumerico(BigDecimal.ZERO,sqrt(real.negate()));
+		}else{
+			return ZERO;
+		}
 	}
 	private static BigDecimal sqrt(BigDecimal value) {
 		BigDecimal x = new BigDecimal(Math.sqrt(value.doubleValue()));

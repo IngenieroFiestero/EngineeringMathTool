@@ -100,7 +100,7 @@ public class Test {
 		System.out.println("--------------- Ejecutar Ops -------------------");
 		try {
 			//Operacion operac = mi.getOperacion("[a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);", ops);
-			String expresion = "a=sqrt(4)+sqrt(sqrt(16)+4)+i";
+			String expresion = "a=sqrt(-4)+sqrt(sqrt(16)+4)+(-3i)";
 			System.out.println("Interpretando expresion: " + expresion);
 			ExpresionInterpretada eiAux = mi.evaluarExpresion(expresion);
 			String ret = mi.interpretarExpresion(eiAux);
