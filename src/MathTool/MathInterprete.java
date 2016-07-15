@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.Executor;
 
-import com.sun.xml.internal.fastinfoset.util.StringArray;
-
 import Matriz.Matriz;
 import Matriz.MatrizException;
 import Matriz.MatrizExpresion;
@@ -74,7 +72,7 @@ public class MathInterprete {
 		System.out.println("Llamada con texto: " + txt);
 		if(txt == null || txt.length() == 0){
 			
-		}else if(txt.charAt(txt.length()-1) == ';'){
+		}else if(txt.charAt(txt.length()-1) == ';' && txt.length() > 1){
 			//El ultimo caracter es para no imprimir por pantalla
 			Operacion op = new Operacion(new Operando[]{
 					new Operando(getOperacion(txt.substring(0,txt.length()-1),ops).getId())},
@@ -99,7 +97,7 @@ public class MathInterprete {
 				}
 				Operacion op = new Operacion(new Operando[]{
 						op1,
-						new Operando(getOperacion(split[2],ops).getId())},
+						new Operando(spliter(split[2]).length > 1 || hasMoreLevels(split[2])? getOperacion(split[2],ops).getId() : split[2])},
 						Operador.ASIGNACION);
 				//Hemos creado la operacion ahora la insertamos y le asignamos un id
 				op.setId(ops.insert(op));
@@ -149,9 +147,10 @@ public class MathInterprete {
 								}
 							}
 							System.out.println(op1 + " .... " + op2);
+							System.out.println(spliter(op1).length);
 							op = new Operacion(new Operando[]{
-									new Operando(hasMoreLevels(op1)? getOperacion(op1, ops) : op1),
-									new Operando(hasMoreLevels(op2)? getOperacion(op2, ops) : op2)
+									new Operando(spliter(op1).length > 1 || hasMoreLevels(op1) ||validVariableName(op1)  ? getOperacion(op1, ops) : op1),
+									new Operando(spliter(op2).length > 1 || hasMoreLevels(op2) ||validVariableName(op2)  ? getOperacion(op2, ops) : op2)
 							},suma);
 							op.setId(ops.insert(op));
 							return op;
@@ -196,8 +195,8 @@ public class MathInterprete {
 								}
 							}
 							op = new Operacion(new Operando[]{
-									new Operando(hasMoreLevels(op1)? getOperacion(op1, ops) : op1),
-									new Operando(hasMoreLevels(op2)? getOperacion(op2, ops) : op2)
+									new Operando(spliter(op1).length > 1 || hasMoreLevels(op1)||validVariableName(op1) ? getOperacion(op1, ops) : op1),
+									new Operando(spliter(op2).length > 1 || hasMoreLevels(op2) ||validVariableName(op2) ? getOperacion(op2, ops) : op2)
 							},suma);
 							op.setId(ops.insert(op));
 							return op;
@@ -271,7 +270,7 @@ public class MathInterprete {
 			Operando[] operandos = new Operando[args.length+1];
 			operandos[0] = new Operando(new Funcion(name));
 			for (int i = 0; i < args.length; i++) {
-				operandos[i+1] = new Operando(hasMoreLevels(args[i])? getOperacion(args[i], op) : args[i]);
+				operandos[i+1] = new Operando(spliter(args[i]).length > 1 || hasMoreLevels(args[i])? getOperacion(args[i], op) : args[i]);
 			}
 			Operacion operacion = new Operacion(operandos, Operador.EJECUTAR_FUNCION);
 			return operacion;
@@ -418,6 +417,7 @@ public class MathInterprete {
 					try {
 						var.setValor(valor);
 						op.getResultado().setValor(valor);
+						this.contexto.setVariableValue(name, valor);
 					} catch (VariableException e) {
 						throw new InterpreteException(e.getMessage());
 					}
@@ -440,6 +440,26 @@ public class MathInterprete {
 			}
 			try {
 				op.getResultado().setValor(Operador.suma(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					ret = ret + op.getResultado().getValor()+"\n";
+				}
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.RESTA:
+			//Operacion resta
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+			}
+			try {
+				op.getResultado().setValor(Operador.resta(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					ret = ret + op.getResultado().getValor()+"\n";
+				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
 			}
@@ -454,6 +474,9 @@ public class MathInterprete {
 			}
 			try {
 				op.getResultado().setValor(Operador.multiplicacion(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					ret = ret + op.getResultado().getValor()+"\n";
+				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
 			}
@@ -464,10 +487,31 @@ public class MathInterprete {
 			aux[0] = opd[0];
 			for (int i = 1; i < opd.length; i++) {
 				//Asignamos de verdad los valores para no tener que castear manualmente
+				System.out.println(opd[i]);
 				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+				System.out.println(aux[i]);
 			}
 			try {
 				op.getResultado().setValor(Operador.ejecutarFuncion(aux, this.contexto));
+				if(op.getId() == lo.size()-1){
+					ret = ret + op.getResultado().getValor()+"\n";
+				}
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.EVALUACION:
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+			}
+			try {
+				op.getResultado().setValor(aux[0].getValor());
+				if(op.getId() == lo.size()-1){
+					ret = ret + op.getResultado().getValor()+"\n";
+				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
 			}
@@ -785,9 +829,11 @@ public class MathInterprete {
 	private Object asignarValores(Operando op,ContextoMatematico mc,ListaOperaciones lo) throws InterpreteException{
 		switch (op.getTipo()) {
 		case Operando.VARIABLE:
-			return mc.findVariableByName(((Variable)op.getValor()).getName());
+			System.out.println(op);
+			return mc.findVariableByName(((Variable)op.getValor()).getName()).getValue();
 		case Operando.RESULTADO:
-			return lo.get(((Integer)op.getValor()).intValue()).getResultado().getValor();
+			Object valor = lo.get(((Integer)op.getValor()).intValue()).getResultado().getValor();
+			return valor;
 		case Operando.VALOR_NUMERICO:
 			return op.getValor();
 		case Operando.MATRIZ:

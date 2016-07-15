@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import MathTool.Funcion;
+import MathTool.MathInterprete;
 import Matriz.Matriz;
 import Matriz.MatrizException;
 import Matriz.MatrizExpresion;
@@ -43,25 +44,30 @@ public class Operando {
 			this.tipo = MATRIZ;
 		}else if(operando instanceof String){
 			String txt = (String)operando;
-			try {
-				this.operando = new ValorNumerico(txt);
-				this.tipo = VALOR_NUMERICO;
-			} catch (ValorNumericoException e) {
+			if(MathInterprete.validVariableName(txt)){
+				this.tipo = VARIABLE;
+				this.operando = new Variable(txt);
+			}else{
 				try {
-					Matriz mat = new Matriz(txt);
-					this.operando = mat;
-					this.tipo = MATRIZ;
-				} catch (MatrizException e1) {
-					this.tipo = EXPRESION;
-					this.operando = operando;
-					/*try {
-						MatrizExpresion me = new MatrizExpresion(txt);
-						this.operando = me;
-						this.tipo = MATRIZ_EXPRESION;
-					} catch (MatrizException e2) {
+					this.operando = new ValorNumerico(txt);
+					this.tipo = VALOR_NUMERICO;
+				} catch (ValorNumericoException e) {
+					try {
+						Matriz mat = new Matriz(txt);
+						this.operando = mat;
+						this.tipo = MATRIZ;
+					} catch (MatrizException e1) {
 						this.tipo = EXPRESION;
 						this.operando = operando;
-					}*/
+						/*try {
+							MatrizExpresion me = new MatrizExpresion(txt);
+							this.operando = me;
+							this.tipo = MATRIZ_EXPRESION;
+						} catch (MatrizException e2) {
+							this.tipo = EXPRESION;
+							this.operando = operando;
+						}*/
+					}
 				}
 			}
 		}else if(operando instanceof Integer){

@@ -11,6 +11,9 @@ import ValorNumerico.ValorNumericoException;
 public class FuncionUtils {
 	public static final int IS_PRIME = 1;
 	public static final int SQRT = 2;
+	public static final int MAX = 3;
+	public static final int MIN = 4;
+	public static final int LENGTH = 5;
 	
 	public static Object ejecutar(int id,Operando[] ops) throws InterpreteException{
 		switch(id){
@@ -18,6 +21,12 @@ public class FuncionUtils {
 			break;
 		case SQRT:
 			return sqrt(ops);
+		case MAX:
+			return max(ops);
+		case MIN:
+			return min(ops);
+		case LENGTH:
+			return length(ops);
 		}
 		return null;
 	}
@@ -47,5 +56,60 @@ public class FuncionUtils {
 		}else{
 			throw new InterpreteException("Needed only 1 argument");
 		}
-	} 
+	}
+	/**
+	 * Obtiene el valor Numerico maximo
+	 * @param ops
+	 * @return
+	 * @throws InterpreteException
+	 */
+	public static Object max(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				return ((ValorNumerico)ops[1].getValor());
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				return ((Matriz)ops[1].getValor()).max();
+			}else{
+				throw new InterpreteException("Crash Error in max()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	/**
+	 * Obtiene el valor Numerico Minimo
+	 * @param ops
+	 * @return
+	 * @throws InterpreteException
+	 */
+	public static Object min(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				return ((ValorNumerico)ops[1].getValor());
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				return ((Matriz)ops[1].getValor()).min();
+			}else{
+				throw new InterpreteException("Crash Error in min()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	public static Object length(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				return ValorNumerico.ONE;
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				Matriz mat = ((Matriz)ops[1].getValor());
+				Matriz ret = new Matriz(new int[]{1,2});
+				ret.set(new int[]{0, 0 }, new ValorNumerico(mat.dimensions()[0]));
+				ret.set(new int[]{0, 1 }, new ValorNumerico(mat.dimensions()[1]));
+				return ret;
+			}else{
+				throw new InterpreteException("Crash Error in length()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
 }

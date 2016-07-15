@@ -15,7 +15,8 @@ public class ContextoMatematico implements Serializable{
 	private ListaVariables variableList;
 	private ListaFunciones funcionList;
 	private ListaScripts scriptList;
-	public static MathContext MATH_CONTEXT = new MathContext(MathContext.UNLIMITED.getPrecision(),RoundingMode.UP);
+	//sOLO FUNCIONA BIEN CON UNLIMITED
+	public static MathContext MATH_CONTEXT = new MathContext(MathContext.DECIMAL32.getPrecision(),RoundingMode.HALF_EVEN);
 	
 	public ContextoMatematico(){
 		this.variableList = ListaVariables.listaPorDefecto();
@@ -98,6 +99,13 @@ public class ContextoMatematico implements Serializable{
 		try {
 			variableList.addVariable(var);
 		} catch (InterpreteException e) {}
+	}
+	public void setVariableValue(String name,Object val){
+		try {
+			Variable var = findVariableByName(name);
+		} catch (InterpreteException e) {
+			addVariable(new Variable(name, val));
+		}
 	}
 	public void addFuncion(Funcion fun){
 		funcionList.addFuncion(fun);

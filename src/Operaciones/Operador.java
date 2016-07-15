@@ -38,37 +38,39 @@ public class Operador {
 		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
 			return (((Matriz)op1.getValor()).sumar((Matriz)op2.getValor()));
 		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
-			return (new Matriz((ValorNumerico)op1.getValor())).sumar((Matriz)op2.getValor());
+			return (new Matriz((ValorNumerico)op1.getValor(),((Matriz)op2.getValor()).dimensions())).sumar((Matriz)op2.getValor());
 		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
-			return (new Matriz((ValorNumerico)op2.getValor())).sumar((Matriz)op1.getValor());
+			return (new Matriz((ValorNumerico)op2.getValor(),((Matriz)op1.getValor()).dimensions())).sumar((Matriz)op1.getValor());
 		}else{
 			return null;
 		}
 	}
 	public static Object resta(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{
 		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
-			return (((ValorNumerico)op1.getValor()).negate().add((ValorNumerico)op2.getValor()));
+			return (((ValorNumerico)op1.getValor()).add(((ValorNumerico)op2.getValor()).negate()));
 		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
-			return (((Matriz)op1.getValor()).sumar((Matriz)op2.getValor()));
+			return (((Matriz)op1.getValor()).restar((Matriz)op2.getValor()));
 		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
-			return (new Matriz((ValorNumerico)op1.getValor())).restar((Matriz)op2.getValor());
+			return (new Matriz((ValorNumerico)op1.getValor(),((Matriz)op2.getValor()).dimensions())).restar((Matriz)op2.getValor());
 		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
-			return (new Matriz((ValorNumerico)op2.getValor())).restar((Matriz)op1.getValor());
+			return ((Matriz)op1.getValor()).restar(new Matriz((ValorNumerico)op2.getValor(),((Matriz)op1.getValor()).dimensions()));
 		}else{
 			return null;
 		}
 	}
-	public static Object multiplicacion(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{
+	public static Object multiplicacion(Operando op1, Operando op2) throws MatrizException, ValorNumericoException, InterpreteException{
+		System.out.println("Prueba " + op1.getTipo() + " " +op2.getTipo());
 		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
 			return (((ValorNumerico)op1.getValor()).multiply((ValorNumerico)op2.getValor()));
 		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
 			return (((Matriz)op1.getValor()).multiplicar((Matriz)op2.getValor()));
 		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
-			return (new Matriz((ValorNumerico)op1.getValor())).multiplicar((Matriz)op2.getValor());
+			
+			return (new Matriz((ValorNumerico)op1.getValor(),((Matriz)op2.getValor()).dimensions())).multiplicarP2P((Matriz)op2.getValor());
 		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
-			return (new Matriz((ValorNumerico)op2.getValor())).multiplicar((Matriz)op1.getValor());
+			return (new Matriz((ValorNumerico)op2.getValor(),((Matriz)op1.getValor()).dimensions())).multiplicarP2P((Matriz)op1.getValor());
 		}else{
-			return null;
+			throw new InterpreteException("Not valid operando");
 		}
 	}
 	public static Object modulo(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{

@@ -100,11 +100,13 @@ public class Test {
 		System.out.println("--------------- Ejecutar Ops -------------------");
 		try {
 			//Operacion operac = mi.getOperacion("[a,b]=x+pepe([2],3,pepe2(7,9))+(4*5);", ops);
-			String expresion = "a=sqrt(-4)+sqrt(sqrt(16)+4)+(-3i)";
+			String expresion = "a=[1,2,3;4,5,5]";
 			System.out.println("Interpretando expresion: " + expresion);
 			ExpresionInterpretada eiAux = mi.evaluarExpresion(expresion);
 			String ret = mi.interpretarExpresion(eiAux);
 			System.out.println(ret);
+			ExpresionInterpretada eiAux2 = mi.evaluarExpresion("x=length(a)");
+			System.out.println(mi.interpretarExpresion(eiAux2));
 		} catch (InterpreteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -32,6 +32,9 @@ public class ListaFunciones {
 	public static ListaFunciones listaPorDefecto(){
 		ArrayList<Funcion> lista = new ArrayList<Funcion>();
 		lista.add(new Funcion("sqrt",FuncionUtils.SQRT));
+		lista.add(new Funcion("max",FuncionUtils.MAX));
+		lista.add(new Funcion("min",FuncionUtils.MIN));
+		lista.add(new Funcion("length",FuncionUtils.LENGTH));
 		return new ListaFunciones(lista);
 	}
 	public void addFuncion(Funcion fun){

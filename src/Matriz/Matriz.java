@@ -24,6 +24,14 @@ public class Matriz implements  Cloneable{
 		matriz = new ValorNumerico[1][1];
 		matriz[0][0] = val;
 	}
+	public Matriz(ValorNumerico val,int[] length){
+		matriz = new ValorNumerico[length[0]][length[1]];
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				matriz[i][j] = val;
+			}
+		}
+	}
 	public Matriz(String txt) throws MatrizException{
 		if(txt.charAt(0) == '[' && txt.charAt(txt.length()-1) == ']'){
 			txt = txt.substring(1,txt.length()-1);
@@ -167,10 +175,28 @@ public class Matriz implements  Cloneable{
 		}
 		return ret;
 	}
+	public ValorNumerico max(){
+		ValorNumerico max = matriz[0][0];
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				max = max.compareTo(matriz[i][j]) == -1 ? matriz[i][j] : max;
+			}
+		}
+		return (ValorNumerico) max.clone();
+	}
+	public ValorNumerico min(){
+		ValorNumerico min = matriz[0][0];
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length - 1; j++) {
+				min = min.compareTo(matriz[i][j]) == 1 ? matriz[i][j] : min;
+			}
+		}
+		return (ValorNumerico) min.clone();
+	}
 	public String toStringInLine() {
 		String ret = "[";
 		for (int i = 0; i < matriz.length ; i++) {
-			for (int j = 0; j < matriz[0].length - 1; j++) {
+			for (int j = 0; j < matriz[0].length; j++) {
 				ret = ret + matriz[i][j]+ ",\t";
 			}
 			if(i == matriz.length-1){
