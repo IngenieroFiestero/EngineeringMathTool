@@ -1,4 +1,5 @@
 package ValorNumerico;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,10 +18,11 @@ import MathTool.MathInterprete;
 import MathTool.MathSerialize;
 import Variable.Variable;
 
-public class ValorNumerico implements Cloneable,Serializable {
+public class ValorNumerico implements Cloneable, Serializable {
 	private static final long serialVersionUID = -2942022796658879818L;
-	private BigDecimal real;
-	private BigDecimal imaginario;
+	private double real;
+	private double imaginario;
+	private double denominador;
 	public static final String IMAGINARIO = "i";
 	public static final String[] TOKENS = new String[] { " ", "+", "-", "i" };
 	public static final ValorNumerico I = new ValorNumerico(0.0, 1.0);
@@ -28,23 +30,24 @@ public class ValorNumerico implements Cloneable,Serializable {
 	public static final ValorNumerico ZERO = new ValorNumerico(0.0, 0.0);
 	public static final ValorNumerico E = new ValorNumerico(Math.E);
 	public static final ValorNumerico PI = new ValorNumerico(Math.PI);
-	public static final String[] SIGNOS = new String[] {"","" ,"+"};
+	public static final String[] SIGNOS = new String[] { "", "", "+" };
+
 	public ValorNumerico(double real) {
 		this(real, 0.0);
 	}
 
 	public ValorNumerico(double real, double imaginario) {
-		this.real = new BigDecimal(real,ContextoMatematico.MATH_CONTEXT);
-		this.imaginario = new BigDecimal(imaginario,ContextoMatematico.MATH_CONTEXT);
-	}
-	public ValorNumerico(BigDecimal real) {
-		this.real = real;
-		this.imaginario = BigDecimal.ZERO;
-	}
-	public ValorNumerico(BigDecimal real, BigDecimal imaginario) {
 		this.real = real;
 		this.imaginario = imaginario;
+		this.denominador = 1;
 	}
+
+	public ValorNumerico(double real, double imaginario, double denominador) {
+		this.real = real;
+		this.imaginario = imaginario;
+		this.denominador = denominador;
+	}
+
 	public ValorNumerico(String numero) throws ValorNumericoException {
 		String[] valores = spliter(numero);
 		ArrayList<Integer> numeros = new ArrayList<Integer>();
@@ -54,14 +57,15 @@ public class ValorNumerico implements Cloneable,Serializable {
 		for (int i = 0; i < valores.length; i++) {
 			if (isNumber(valores[i])) {
 				numeros.add(new Integer(i));
-			}else if(valores[i].equals("i") || valores[i].equals("+") || valores[i].equals("-") || valores[i].equals(" ")){
-			}else{
+			} else if (valores[i].equals("i") || valores[i].equals("+") || valores[i].equals("-")
+					|| valores[i].equals(" ")) {
+			} else {
 				valid = false;
 			}
 		}
-		if(valores.length == 1 && valores[0].equals("i")){
+		if (valores.length == 1 && valores[0].equals("i")) {
 			imagin = 1;
-		}else{
+		} else {
 			for (int i = 0; i < numeros.size(); i++) {
 				int pos = numeros.get(i);
 				if ((pos + 1) < valores.length && valores[pos + 1].equals(IMAGINARIO)) {
@@ -71,7 +75,7 @@ public class ValorNumerico implements Cloneable,Serializable {
 					} else {
 						imagin = Double.parseDouble(valores[pos]);
 					}
-				}else {
+				} else {
 					if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
 						real = Double.parseDouble(valores[pos - 1] + valores[pos]);
 					} else {
@@ -80,53 +84,97 @@ public class ValorNumerico implements Cloneable,Serializable {
 				}
 			}
 		}
-		if(!valid){
+		if (!valid) {
 			throw new ValorNumericoException("Not Valid");
 		}
-		this.real = new BigDecimal(real,ContextoMatematico.MATH_CONTEXT);
-		this.imaginario = new BigDecimal(imagin,ContextoMatematico.MATH_CONTEXT);
+		this.real = real;
+		this.imaginario = imagin;
+		this.denominador = 1;
 	}
 
 	public String toString() {
-		if (this.imaginario.doubleValue() == 0) {
-			return this.real.toString();
-		} else if (this.real.doubleValue() == 0 && this.imaginario.doubleValue() == 1) {
-			return "i";
-		}else if(this.real.doubleValue() == 0){
-			return this.imaginario.toString() + "i";
-		} else {
-			return SIGNOS[this.real.signum()+1]+this.real.toString() + " " +SIGNOS[this.imaginario.signum()+1]+ this.imaginario.toString() + "i";
+		if(denominador == 1){
+			if (this.imaginario == 0) {
+				return this.real + "";
+			} else if (this.real == 0 && this.imaginario == 1) {
+				return "i";
+			} else if (this.real == 0) {
+				return this.imaginario + "i";
+			} else {
+				return this.real + " " + (this.imaginario > 0 ? "+" : "") + this.imaginario + "i";
+			}
+		}else{
+			if (this.imaginario == 0) {
+				return this.real/denominador + "";
+			} else if (this.real == 0 && this.imaginario == 1) {
+				return (1/denominador) + "i";
+			} else if (this.real == 0) {
+				return (this.imaginario/denominador) + "i";
+			} else {
+				return this.real/denominador + " " + (this.imaginario > 0 ? "+" : "") + this.imaginario/denominador + "i";
+			}
 		}
+		
 	}
 
-	public BigDecimal getReal() {
+	public double getReal() {
 		return this.real;
 	}
 
-	public BigDecimal getImaginario() {
+	public double getImaginario() {
 		return this.imaginario;
 	}
 
+	public double getDenominador() {
+		return this.denominador;
+	}
+
 	public ValorNumerico add(ValorNumerico val) {
-		return new ValorNumerico(this.real.add(val.getReal()), this.imaginario.add(val.getImaginario()));
+		if (denominador == 1 && val.getDenominador() == 1) {
+			return new ValorNumerico(this.real + val.getReal(), this.imaginario + val.getImaginario(),
+					this.denominador);
+		} else {
+			return new ValorNumerico(this.real * val.getDenominador() + val.getReal() * this.denominador,
+					this.imaginario * val.getDenominador() + val.getImaginario() * this.denominador,
+					this.denominador * val.getDenominador());
+		}
 	}
 
 	public ValorNumerico substract(ValorNumerico val) {
-		return new ValorNumerico(this.real.subtract(val.getReal()), this.imaginario.subtract(val.getImaginario()));
+		if (denominador == 1 && val.getDenominador() == 1) {
+			return new ValorNumerico(this.real - val.getReal(), this.imaginario + val.getImaginario(),
+					this.denominador);
+		} else {
+			return new ValorNumerico(this.real * val.getDenominador() - val.getReal() * this.denominador,
+					this.imaginario * val.getDenominador() - val.getImaginario() * this.denominador,
+					this.denominador * val.denominador);
+		}
 	}
 
 	public ValorNumerico conjugate() {
-		return new ValorNumerico(this.real, this.imaginario.negate());
+		return new ValorNumerico(this.real, -this.imaginario, denominador);
 	}
 
 	public ValorNumerico divide(ValorNumerico divisor) throws ValorNumericoException {
-		checkNotNull(divisor);
-		BigDecimal denominador = (divisor.getReal().multiply(divisor.getReal())
-				.add(divisor.getImaginario().multiply(divisor.getImaginario())));
-		return new ValorNumerico((this.real.multiply(divisor.getReal())
-				.add(this.imaginario.multiply(divisor.getImaginario()))).divide(denominador),
-				(this.real.multiply(divisor.getImaginario())
-						.add(this.imaginario.multiply(divisor.getReal()))).divide(denominador));
+		if((divisor.real == 0 && divisor.imaginario == 0)){
+			return new ValorNumerico(this.real*divisor.denominador,
+					this.imaginario*divisor.denominador,0);
+		}
+		if (this.denominador == 1 && divisor.getDenominador() == 1) {
+			return new ValorNumerico((this.real * divisor.getReal() - this.imaginario * divisor.getImaginario()),
+					this.real * divisor.getImaginario() + this.imaginario * divisor.getReal(),
+					(divisor.getReal() * divisor.getReal()
+							+ divisor.getImaginario() * divisor.getImaginario()));
+
+		} else {
+			return new ValorNumerico(
+					divisor.getDenominador()
+							* (this.real * divisor.getReal() - this.imaginario * divisor.getImaginario()),
+					divisor.getDenominador()
+							* (this.real * divisor.getImaginario() + this.imaginario * divisor.getReal()),
+					this.denominador * (divisor.getReal() * divisor.getReal()
+							+ divisor.getImaginario() * divisor.getImaginario()));
+		}
 	}
 
 	@Override
@@ -136,30 +184,37 @@ public class ValorNumerico implements Cloneable,Serializable {
 		}
 		if (other instanceof ValorNumerico) {
 			ValorNumerico c = (ValorNumerico) other;
-			return ((BigDecimal)((ValorNumerico)other).getReal()).compareTo(this.real) == 0 &&
-					((BigDecimal)((ValorNumerico)other).getImaginario()).compareTo(this.imaginario) == 0;
+			return ((ValorNumerico) other).getReal() == (this.real)
+					&& ((ValorNumerico) other).getImaginario() == (this.imaginario)
+					&& ((ValorNumerico) other).getDenominador() == (this.denominador);
 		}
 		return false;
 	}
 
 	public ValorNumerico multiply(ValorNumerico factor) throws ValorNumericoException {
-		checkNotNull(factor);
-		return new ValorNumerico(real.multiply(factor.getReal()).subtract(imaginario.multiply(factor.getImaginario())),
-				real.multiply(factor.getImaginario()).add(imaginario.multiply(factor.getReal())));
+		return new ValorNumerico(real * factor.real - imaginario * factor.imaginario,
+				real * factor.imaginario + imaginario * factor.real,
+				denominador*factor.denominador);
 	}
-	public Object clone(){
-		return new ValorNumerico(this.real,this.imaginario);
+
+	public Object clone() {
+		return new ValorNumerico(this.real, this.imaginario);
 	}
+
 	public ValorNumerico negate() {
-		return new ValorNumerico(real.negate(), imaginario.negate());
+		return new ValorNumerico(-real, -imaginario);
 	}
-	public void setRand(){
-		this.real = new BigDecimal(Math.random(),ContextoMatematico.MATH_CONTEXT);
-		this.imaginario = new BigDecimal(Math.random(),ContextoMatematico.MATH_CONTEXT);
+
+	public void setRand() {
+		this.real = Math.random();
+		this.imaginario = Math.random();
+		this.denominador = 1;
 	}
-	public void setNull(){
-		this.real = BigDecimal.ZERO;
-		this.imaginario = BigDecimal.ZERO;
+
+	public void setNull() {
+		this.real = 0;
+		this.imaginario = 0;
+		this.denominador = 1;
 	}
 
 	public static boolean isSign(String sign) {
@@ -221,106 +276,248 @@ public class ValorNumerico implements Cloneable,Serializable {
 
 		return ret;
 	}
-	public ValorNumerico modulo(ValorNumerico val) throws ValorNumericoException{
-		if(val.getImaginario().compareTo(BigDecimal.ZERO) != 0 || imaginario.compareTo(BigDecimal.ZERO) != 0){
+
+	public ValorNumerico modulo(ValorNumerico val) throws ValorNumericoException {
+		if (val.getImaginario() != 0 || imaginario!= 0) {
 			throw new ValorNumericoException("Arguments must be real");
-		}else{
-			BigDecimal rem = this.real.divideToIntegralValue(val.getReal());
-			return new ValorNumerico(returnAproxNumber(this.real.subtract(rem.multiply(val.getReal()))));
+		} else {
+			return new ValorNumerico((this.real/denominador)/(val.getReal()/this.denominador));
 		}
 	}
+
 	/**
-	 * Recorre la cadena y elimina zeros de gratis. Es muy lento hay que buscar una forma mejor o utilizarlo en el ContextoMatematico
+	 * Recorre la cadena y elimina zeros de gratis. Es muy lento hay que buscar
+	 * una forma mejor o utilizarlo en el ContextoMatematico
+	 * 
 	 * @param bd
 	 * @return
 	 */
-	private BigDecimal returnAproxNumber(BigDecimal bd){
+	private BigDecimal returnAproxNumber(BigDecimal bd) {
 		String cadena = bd.toString();
 		int firstZero = 0;
 		int lastZero = 0;
 		int count = 0;
-		int lengthMin = Math.max((int) (cadena.length()*0.05),1);
+		int lengthMin = Math.max((int) (cadena.length() * 0.05), 1);
 		for (int i = 0; i < cadena.length(); i++) {
-			if(cadena.charAt(i) == '0'){
-				if(count == 0){
+			if (cadena.charAt(i) == '0') {
+				if (count == 0) {
 					firstZero = i;
 				}
 				count++;
-			}else{
-				if(count >= lengthMin){
-					lastZero = i+1;
-					return new BigDecimal(cadena.substring(0,firstZero));
-				}else{
+			} else {
+				if (count >= lengthMin) {
+					lastZero = i + 1;
+					return new BigDecimal(cadena.substring(0, firstZero));
+				} else {
 					count = 0;
 				}
 			}
 		}
 		return bd;
 	}
+
 	/**
-	 * Utilidad para trabajar con divisores, puesto que una de las variables que se guardan son los divisores
+	 * Utilidad para trabajar con divisores, puesto que una de las variables que
+	 * se guardan son los divisores
+	 * 
 	 * @param num
 	 * @return
 	 */
-	public static long[] divisores(double num){
+	public static long[] divisores(double num) {
 		ArrayList<Long> lista = new ArrayList<Long>();
 		long i;
-        for (i = 2; i <= num / 2; i++) {
-            if (num % i == 0) {
-                lista.add(i);
-            }
-        }
-        long[] list = new long[lista.size()];
-        for (int j = 0; j < list.length; j++) {
+		for (i = 2; i <= num / 2; i++) {
+			if (num % i == 0) {
+				lista.add(i);
+			}
+		}
+		long[] list = new long[lista.size()];
+		for (int j = 0; j < list.length; j++) {
 			list[j] = lista.get(j);
 		}
-        return list;
+		return list;
 	}
-	public int compareTo(ValorNumerico val){
-		return absolute().compareTo(val.absolute());
+
+	public int compareTo(ValorNumerico val) {
+		double abs1= absolute();
+		double abs2 = val.absolute();
+		if(abs1>abs2){
+			return 1;
+		}else if(abs1==abs2){
+			return 0;
+		}else{
+			return -1;
+		}
 	}
-	public BigDecimal absolute(){
-		return new BigDecimal(Math.sqrt(real.multiply(real).add(imaginario.multiply(imaginario)).doubleValue()),ContextoMatematico.MATH_CONTEXT);
+
+	public double absolute() {
+		double valReal =(real*real)+(imaginario*imaginario);
+		double den = denominador*denominador;
+		return Math.sqrt(valReal/den);
 	}
+
 	public static void checkNotNull(ValorNumerico val) throws ValorNumericoException {
 		if (val.equals(ValorNumerico.ZERO)) {
 			throw new ValorNumericoException(ValorNumericoException.generarErrorDenominadorNulo());
 		}
 	}
-	public static ValorNumerico load(InputStream is) throws IOException{
+
+	public static ValorNumerico load(InputStream is) throws IOException {
 		DataInputStream dis = new DataInputStream(is);
-		BigDecimal real = new BigDecimal(dis.readUTF(),ContextoMatematico.MATH_CONTEXT);
-		BigDecimal imaginario = new BigDecimal(dis.readUTF(),ContextoMatematico.MATH_CONTEXT);
+		double real = dis.readDouble();
+		double imaginario = dis.readDouble();
+		double denominador = dis.readDouble();
 		dis.close();
-		return new ValorNumerico(real,imaginario);
+		return new ValorNumerico(real, imaginario,denominador);
 	}
-	public void save(OutputStream os) throws IOException{
+
+	public void save(OutputStream os) throws IOException {
 		DataOutputStream dos = new DataOutputStream(os);
-		//Escribir primero el tipo de informacion que vamos a almacenar
-		dos.writeUTF(real.toString());
-		dos.writeUTF(imaginario.toString());
-		dos.close();//Siempre mandar la informacion directamente al OutputStream al acabar
+		// Escribir primero el tipo de informacion que vamos a almacenar
+		dos.writeDouble(real);
+		dos.writeDouble(imaginario);
+		dos.writeDouble(denominador);
+		dos.close();// Siempre mandar la informacion directamente al
+					// OutputStream al acabar
 	}
-	public byte[] getBytes() throws IOException{
+
+	public byte[] getBytes() throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		this.save(baos);
 		return baos.toByteArray();
 	}
-	public ValorNumerico sqrt() throws ValorNumericoException{
-		if(imaginario.compareTo(BigDecimal.ZERO) != 0){
+
+	public ValorNumerico sqrt() throws ValorNumericoException {
+		if (imaginario != 0) {
 			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sqrt()"));
 		}
-		if(real.compareTo(BigDecimal.ZERO) == 1){
-			return new ValorNumerico(sqrt(real));
-		}else if(real.compareTo(BigDecimal.ZERO) == -1){
-			//Si el real es negativo entonces la raiz cuadrada es compleja
-			return new ValorNumerico(BigDecimal.ZERO,sqrt(real.negate()));
-		}else{
+		if (real >0) {
+			return new ValorNumerico(Math.sqrt(real),0,Math.sqrt(denominador));
+		} else if (real < 0 ) {
+			// Si el real es negativo entonces la raiz cuadrada es compleja
+			return new ValorNumerico(0, Math.sqrt(-real));
+		} else {
 			return ZERO;
 		}
 	}
+
 	private static BigDecimal sqrt(BigDecimal value) {
 		BigDecimal x = new BigDecimal(Math.sqrt(value.doubleValue()));
-	    return x.add(new BigDecimal(value.subtract(x.multiply(x)).doubleValue() / (x.doubleValue() * 2.0)));
+		return x.add(new BigDecimal(value.subtract(x.multiply(x)).doubleValue() / (x.doubleValue() * 2.0)));
+	}
+
+	public ValorNumerico sin() throws ValorNumericoException {
+		if (imaginario  != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sin()"));
+		}
+		if(real == 0){
+			return new ValorNumerico(0.0);
+		}
+		if(real%Math.PI == 0){
+			int num = (int) (real/Math.PI);
+			denominador = denominador / num;
+			real = real/num;
+			num = (int) (real/Math.PI);
+			if(denominador%1 == 0){
+				int den = (int) denominador;
+				if(num == 1){
+					switch(den){
+					case 6:
+						return new ValorNumerico(1.0,0,2);
+					case 4:
+						return new ValorNumerico(Math.sqrt(2),0,2);
+					case 3:
+						return new ValorNumerico(Math.sqrt(3),0,2);
+					case 1:
+						return new ValorNumerico(0);
+					default:
+						break;
+					}
+				}
+				if(den == 2){
+					if(num%4 == 1){
+						return new ValorNumerico(1);
+					}else if(num%4 == 3){
+						return new ValorNumerico(-1);
+					}
+				}
+				
+			}
+			
+		}
+		return new ValorNumerico(Math.sin(real/denominador));
+	}
+
+	public ValorNumerico asin() throws ValorNumericoException {
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sin()"));
+		}
+		return new ValorNumerico(Math.asin(real/denominador));
+	}
+
+	public ValorNumerico cos() throws ValorNumericoException {
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("cos()"));
+		}
+		if(real == 0){
+			return new ValorNumerico(0.0);
+		}
+		if(real%Math.PI == 0){
+			int num = (int) (real/Math.PI);
+			denominador = denominador / num;
+			real = real/num;
+			num = (int) (real/Math.PI);
+			if(denominador%1 == 0){
+				int den = (int) denominador;
+				if(den == 1){
+					if(num%2 == 1){
+						return new ValorNumerico(-1);
+					}else if(num%2 == 0){
+						return new ValorNumerico(1);
+					}
+				}
+				if(num == 1){
+					switch(den){
+					case 6:
+						return new ValorNumerico(Math.sqrt(3),0,2);
+					case 4:
+						return new ValorNumerico(1,0,Math.sqrt(2));
+					case 3:
+						return new ValorNumerico(1,0,2);
+					default:
+						break;
+					}
+				}
+				if(den == 2){
+					if(num%4 == 1 || num%4 == 3){
+						return new ValorNumerico(0);
+					}
+				}	
+			}
+			
+		}
+		return new ValorNumerico(Math.cos(real/denominador));
+	}
+
+	public ValorNumerico acos() throws ValorNumericoException {
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("cos()"));
+		}
+		return new ValorNumerico(Math.acos(real/denominador));
+	}
+
+	public ValorNumerico tan() throws ValorNumericoException {
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("tan()"));
+		}
+		return new ValorNumerico(Math.tan(real/denominador));
+	}
+
+	public ValorNumerico atan() throws ValorNumericoException {
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("tan()"));
+		}
+		System.out.println("ATAN: " + real + " " + imaginario + " " + denominador);
+		return new ValorNumerico(Math.atan(real/denominador));
 	}
 }

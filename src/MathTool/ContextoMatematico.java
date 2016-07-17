@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import Variable.Variable;
+import Variable.VariableException;
 
 public class ContextoMatematico implements Serializable{
 	private static final long serialVersionUID = -8069695659613918920L;
@@ -15,14 +16,11 @@ public class ContextoMatematico implements Serializable{
 	private ListaVariables variableList;
 	private ListaFunciones funcionList;
 	private ListaScripts scriptList;
-	//sOLO FUNCIONA BIEN CON UNLIMITED
-	public static MathContext MATH_CONTEXT = new MathContext(MathContext.DECIMAL32.getPrecision(),RoundingMode.HALF_EVEN);
 	
 	public ContextoMatematico(){
 		this.variableList = ListaVariables.listaPorDefecto();
 		this.funcionList = ListaFunciones.listaPorDefecto();
 		this.scriptList = new ListaScripts();
-		MATH_CONTEXT = new MathContext(MathContext.UNLIMITED.getPrecision(),RoundingMode.HALF_EVEN);
 	}
 	/**
 	 * Contexto matematico, contiene las funciones y variables que usar el interprete para poder
@@ -103,6 +101,9 @@ public class ContextoMatematico implements Serializable{
 	public void setVariableValue(String name,Object val){
 		try {
 			Variable var = findVariableByName(name);
+			try {
+				var.setValor(val);
+			} catch (VariableException e) {}
 		} catch (InterpreteException e) {
 			addVariable(new Variable(name, val));
 		}

@@ -1,8 +1,10 @@
 package MathTool;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import ValorNumerico.ValorNumerico;
 import Variable.Variable;
+import Variable.VariableException;
 /**
  * Lista de variables
  * @author admin
@@ -29,11 +31,13 @@ public class ListaVariables {
 		throw new InterpreteException(InterpreteException.generateCantFindError(name));
 	}
 	public void addVariable(Variable var)throws InterpreteException{
-		if(variableList.contains(var)){
-			throw new InterpreteException(InterpreteException.generateAlredyExistsError(var.getName()));
-		}else{
-			variableList.add(var);
+		Iterator iter = variableList.iterator();
+		while(iter.hasNext()){
+			if(((Variable)iter.next()).getName().equals(var.getName())){
+				throw new InterpreteException(InterpreteException.generateAlredyExistsError(var.getName()));
+			}
 		}
+		variableList.add(var);
 	}
 	/**
 	 * Aqui se obtienen las funciones por defecto
@@ -47,5 +51,12 @@ public class ListaVariables {
 	}
 	public Variable[] getVariables(){
 		return variableList.toArray(new Variable[variableList.size()]);
+	}
+	public void setValor(String name,Object val)throws InterpreteException{
+		try {
+			findVariableByName(name).setValor(val);
+		} catch (Exception e) {
+			addVariable(new Variable(name,val));
+		}
 	}
 }

@@ -1,10 +1,7 @@
 package Tests;
 
 import Matriz.Matriz;
-import Operaciones.Operacion;
-import Operaciones.Operador;
 import Operaciones.Operando;
-import Operaciones.Resultado;
 import ValorNumerico.ValorNumerico;
 import ValorNumerico.ValorNumericoException;
 

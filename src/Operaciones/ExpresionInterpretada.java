@@ -6,14 +6,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.concurrent.Executor;
 
 import MathTool.InterpreteException;
 import MathTool.MathInterprete;
-import MathTool.MathToken;
-import Variable.Variable;
 
 /**
  * Compila una línea de codigo

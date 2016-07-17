@@ -175,6 +175,60 @@ public class Matriz implements  Cloneable{
 		}
 		return ret;
 	}
+	public Matriz sin() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.set(new int[]{i, j},matriz[i][j].sin());
+			}
+		}
+		return mat;
+	}
+	public Matriz asin() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.set(new int[]{i, j},matriz[i][j].asin());
+			}
+		}
+		return mat;
+	}
+	public Matriz cos() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.set(new int[]{i, j},matriz[i][j].cos());
+			}
+		}
+		return mat;
+	}
+	public Matriz acos() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.set(new int[]{i, j},matriz[i][j].acos());
+			}
+		}
+		return mat;
+	}
+	public Matriz tan() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.set(new int[]{i, j},matriz[i][j].tan());
+			}
+		}
+		return mat;
+	}
+	public Matriz atan() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.set(new int[]{i, j},matriz[i][j].atan());
+			}
+		}
+		return mat;
+	}
 	public ValorNumerico max(){
 		ValorNumerico max = matriz[0][0];
 		for (int i = 0; i < matriz.length ; i++) {
@@ -347,6 +401,16 @@ public class Matriz implements  Cloneable{
 		}else {
 			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
 		}
+	}
+	public Matriz dividir(ValorNumerico val) throws MatrizException, ValorNumericoException {
+		int[] dim1 = this.dimensions();
+		Matriz ret = new Matriz(dim1);
+		for (int i = 0; i < dim1[0]; i++) {
+			for (int j = 0; j < dim1[1]; j++) {
+				ret.set(new int[] { i, j },matriz[i][j].divide(val));
+			}
+		}
+		return ret;
 	}
 	public Matriz sqrt() throws ValorNumericoException{
 		Matriz mat = (Matriz) this.clone();

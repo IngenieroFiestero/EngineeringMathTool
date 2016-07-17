@@ -59,16 +59,27 @@ public class Operador {
 		}
 	}
 	public static Object multiplicacion(Operando op1, Operando op2) throws MatrizException, ValorNumericoException, InterpreteException{
-		System.out.println("Prueba " + op1.getTipo() + " " +op2.getTipo());
 		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
 			return (((ValorNumerico)op1.getValor()).multiply((ValorNumerico)op2.getValor()));
 		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
 			return (((Matriz)op1.getValor()).multiplicar((Matriz)op2.getValor()));
 		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
-			
 			return (new Matriz((ValorNumerico)op1.getValor(),((Matriz)op2.getValor()).dimensions())).multiplicarP2P((Matriz)op2.getValor());
 		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
 			return (new Matriz((ValorNumerico)op2.getValor(),((Matriz)op1.getValor()).dimensions())).multiplicarP2P((Matriz)op1.getValor());
+		}else{
+			throw new InterpreteException("Not valid operando");
+		}
+	}
+	public static Object division(Operando op1, Operando op2) throws MatrizException, ValorNumericoException, InterpreteException{
+		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
+			return (((ValorNumerico)op1.getValor()).divide((ValorNumerico)op2.getValor()));
+		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
+			return (((Matriz)op1.getValor()).multiplicar(((Matriz)op2.getValor())).invertir());
+		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){
+			throw new InterpreteException("Matrix dimensions must agree");
+		}else if(op2.getTipo() == Operando.VALOR_NUMERICO && op1.getTipo() == Operando.MATRIZ){
+			return ((Matriz)op1.getValor()).dividir((ValorNumerico)op2.getValor());
 		}else{
 			throw new InterpreteException("Not valid operando");
 		}

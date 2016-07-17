@@ -12,6 +12,7 @@ import Operaciones.Operacion;
 import Operaciones.Operador;
 import Operaciones.Operando;
 import Operaciones.Resultado;
+import ValorNumerico.ValorNumerico;
 import ValorNumerico.ValorNumericoException;
 import Variable.Variable;
 import Variable.VariableException;
@@ -421,7 +422,6 @@ public class MathInterprete {
 					} catch (VariableException e) {
 						throw new InterpreteException(e.getMessage());
 					}
-					this.contexto.addVariable(var);
 					ret = ret + name + "\t=\t" + valor;
 				}else{
 					throw new InterpreteException("Not valid variable name");
@@ -481,13 +481,30 @@ public class MathInterprete {
 				throw new InterpreteException(e.getMessage());
 			}
 			break;
+		case Operador.DIVISION:
+			//Operacion division
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+			}
+			try {
+				System.out.println("Division: " + aux[0] +" " +aux[1]);
+				op.getResultado().setValor(Operador.division(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					ret = ret + op.getResultado().getValor() +"\n";
+				}
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
 		case Operador.EJECUTAR_FUNCION:
 			opd = op.getOperandos();
 			aux = new Operando[opd.length];
 			aux[0] = opd[0];
 			for (int i = 1; i < opd.length; i++) {
 				//Asignamos de verdad los valores para no tener que castear manualmente
-				System.out.println(opd[i]);
 				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
 				System.out.println(aux[i]);
 			}
@@ -829,7 +846,6 @@ public class MathInterprete {
 	private Object asignarValores(Operando op,ContextoMatematico mc,ListaOperaciones lo) throws InterpreteException{
 		switch (op.getTipo()) {
 		case Operando.VARIABLE:
-			System.out.println(op);
 			return mc.findVariableByName(((Variable)op.getValor()).getName()).getValue();
 		case Operando.RESULTADO:
 			Object valor = lo.get(((Integer)op.getValor()).intValue()).getResultado().getValor();

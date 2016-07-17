@@ -35,6 +35,12 @@ public class ListaFunciones {
 		lista.add(new Funcion("max",FuncionUtils.MAX));
 		lista.add(new Funcion("min",FuncionUtils.MIN));
 		lista.add(new Funcion("length",FuncionUtils.LENGTH));
+		lista.add(new Funcion("sin",FuncionUtils.SIN));
+		lista.add(new Funcion("cos",FuncionUtils.COS));
+		lista.add(new Funcion("tan",FuncionUtils.TAN));
+		lista.add(new Funcion("asin",FuncionUtils.ASIN));
+		lista.add(new Funcion("acos",FuncionUtils.ACOS));
+		lista.add(new Funcion("atan",FuncionUtils.ATAN));
 		return new ListaFunciones(lista);
 	}
 	public void addFuncion(Funcion fun){
