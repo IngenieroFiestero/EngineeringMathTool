@@ -47,7 +47,7 @@ public class Operador {
 	}
 	public static Object resta(Operando op1, Operando op2) throws MatrizException, ValorNumericoException{
 		if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.VALOR_NUMERICO){
-			return (((ValorNumerico)op1.getValor()).add(((ValorNumerico)op2.getValor()).negate()));
+			return (((ValorNumerico)op1.getValor()).substract(((ValorNumerico)op2.getValor())));
 		}else if(op1.getTipo() == Operando.MATRIZ && op2.getTipo() == Operando.MATRIZ){
 			return (((Matriz)op1.getValor()).restar((Matriz)op2.getValor()));
 		}else if(op1.getTipo() == Operando.VALOR_NUMERICO && op2.getTipo() == Operando.MATRIZ){

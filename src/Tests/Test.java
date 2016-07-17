@@ -46,7 +46,7 @@ public class Test {
 			eiAux2 = mi.evaluarExpresion("x=sin(pi)");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 			System.out.println("----------------------------------");
-			eiAux2 = mi.evaluarExpresion("x=2*x");
+			eiAux2 = mi.evaluarExpresion("x=5.0001-2.01");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 		} catch (InterpreteException e) {
 			// TODO Auto-generated catch block
