@@ -23,7 +23,6 @@ public class Test {
 
 	public static void main(String[] args) throws MatrizException {
 		MathInterprete mi = new MathInterprete();
-		
 		System.out.println("---------------- Lista Variables ------------------");
 		ListaVariables lv = mi.getMathContext().getVariableList();
 		Variable[] list = lv.getVariables();
