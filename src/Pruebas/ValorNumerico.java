@@ -83,12 +83,54 @@ public class ValorNumerico{
 		return ((this.realDenominador == 1)? this.real :this.real + "/"+this.realDenominador) +" " +(this.imaginario == 0 ? "":((this.imaginarioDenominador == 1)? this.imaginario + "i":this.imaginario + "/"+this.imaginarioDenominador + "i") );
 	}
 	public ValorNumerico suma(ValorNumerico val){
-		long realDen = mcm(this.realDenominador, val.realDenominador);
-		long real = (this.real)*(realDen/this.realDenominador) + (val.real)*(realDen/val.realDenominador);
-		long imagDen = mcm(this.imaginarioDenominador, val.imaginarioDenominador);
-		long imag = (this.imaginario)*(imagDen/this.imaginarioDenominador) + (val.imaginario)*(imagDen/val.imaginarioDenominador);
-		return new ValorNumerico(real,imag,realDen,imagDen);
+		try{
+			long realDen = mcm(this.realDenominador, val.realDenominador);
+			long real = (this.real)*(realDen/this.realDenominador) + (val.real)*(realDen/val.realDenominador);
+			long imagDen = mcm(this.imaginarioDenominador, val.imaginarioDenominador);
+			long imag = (this.imaginario)*(imagDen/this.imaginarioDenominador) + (val.imaginario)*(imagDen/val.imaginarioDenominador);
+			return new ValorNumerico(real,imag,realDen,imagDen);
+		}catch(Exception e){
+			simplificarReal();
+			simplificarImaginario();
+			val.simplificarReal();
+			val.simplificarImaginario();
+			long realDen = mcm(this.realDenominador, val.realDenominador);
+			long real = (this.real)*(realDen/this.realDenominador) + (val.real)*(realDen/val.realDenominador);
+			long imagDen = mcm(this.imaginarioDenominador, val.imaginarioDenominador);
+			long imag = (this.imaginario)*(imagDen/this.imaginarioDenominador) + (val.imaginario)*(imagDen/val.imaginarioDenominador);
+			return new ValorNumerico(real,imag,realDen,imagDen);
+		}
 	}
+	public ValorNumerico resta(ValorNumerico val){
+		try{
+			long realDen = mcm(this.realDenominador, val.realDenominador);
+			long real = (this.real)*(realDen/this.realDenominador) - (val.real)*(realDen/val.realDenominador);
+			long imagDen = mcm(this.imaginarioDenominador, val.imaginarioDenominador);
+			long imag = (this.imaginario)*(imagDen/this.imaginarioDenominador) - (val.imaginario)*(imagDen/val.imaginarioDenominador);
+			return new ValorNumerico(real,imag,realDen,imagDen);
+		}catch(Exception e){
+			simplificarReal();
+			simplificarImaginario();
+			val.simplificarReal();
+			val.simplificarImaginario();
+			long realDen = mcm(this.realDenominador, val.realDenominador);
+			long real = (this.real)*(realDen/this.realDenominador) - (val.real)*(realDen/val.realDenominador);
+			long imagDen = mcm(this.imaginarioDenominador, val.imaginarioDenominador);
+			long imag = (this.imaginario)*(imagDen/this.imaginarioDenominador) - (val.imaginario)*(imagDen/val.imaginarioDenominador);
+			return new ValorNumerico(real,imag,realDen,imagDen);
+		}
+	}
+	public void simplificarReal(){
+		long[] sim = simplificarNum(real, realDenominador);
+		this.real = sim[0];
+		this.realDenominador = sim[1];
+	}
+	public void simplificarImaginario(){
+		long[] sim = simplificarNum(imaginario, imaginarioDenominador);
+		this.imaginario = sim[0];
+		this.imaginarioDenominador = sim[1];
+	}
+	
 	public static boolean isNumber(String number) {
 		for (int i = 0; i < number.length(); i++) {
 			char letra = number.charAt(i);
@@ -110,7 +152,7 @@ public class ValorNumerico{
 		}
 	}
 	public static long[] getLongFromDouble(String txt){
-		if(txt.charAt(0) == '+' || txt.charAt(0) == '-'){
+		if(txt.length() > 1 && (txt.charAt(0) == '+' || txt.charAt(0) == '-')){
 			txt = txt.substring(1);
 		}
 		int integerPlaces = txt.indexOf('.');
@@ -119,7 +161,14 @@ public class ValorNumerico{
 			decimalPlaces = txt.length() - integerPlaces - 1;
 			
 		}
-		long num = new Long(txt.substring(0, integerPlaces) + txt.substring(integerPlaces+1));
+		long num = 1;
+		if(decimalPlaces >0){
+			num = new Long(txt.substring(0, integerPlaces) + txt.substring(integerPlaces+1));
+		}else if(txt.length() == 0){
+			num = 0;
+		}else{
+			num = new Long(txt);
+		}
 		long den = 1;
 		for (int i = 0; i < decimalPlaces; i++) {
 			den = den*10;
@@ -182,16 +231,7 @@ public class ValorNumerico{
 		}
 		return ret;
 	}
-	public void simplificarReal(){
-		long[] sim = simplificarNum(real, realDenominador);
-		this.real = sim[0];
-		this.realDenominador = sim[1];
-	}
-	public void simplificarImaginario(){
-		long[] sim = simplificarNum(imaginario, imaginarioDenominador);
-		this.imaginario = sim[0];
-		this.imaginarioDenominador = sim[1];
-	}
+	
 	public static LinkedList<Long> divisores(long num){
 		LinkedList<Long> divisores = new LinkedList<Long>();
 		long numAux = num;
@@ -219,10 +259,14 @@ public class ValorNumerico{
 		int lng = div1.size();
 		for (int i = 0; i < lng; i++) {
 			Long val1 = div1.getFirst();
-			div2.remove(val1);
-			div1.remove(val1);
+			if(div2.remove(val1)){
+				div1.remove(val1);
+			}
 		}
 		long ret1 = 1;
+		if(num == 0){
+			ret1 = 0;
+		}
 		long ret2 = 1;
 		for (int i = 0; i < div1.size(); i++) {
 			ret1=ret1*div1.get(i);
