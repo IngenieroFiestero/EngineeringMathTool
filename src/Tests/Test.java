@@ -42,7 +42,7 @@ public class Test {
 			ExpresionInterpretada eiAux2 = mi.evaluarExpresion("x=atan(sin(pi/3)/cos(pi/3))");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 			System.out.println("----------------------------------");
-			eiAux2 = mi.evaluarExpresion("ln(e^(2))");
+			eiAux2 = mi.evaluarExpresion("inte = matrixIntegration([1,2,3,2],[0.1,0.2,0.3,0.4])");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 			System.out.println("----------------------------------");
 			eiAux2 = mi.evaluarExpresion("ans+4");

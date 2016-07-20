@@ -84,7 +84,6 @@ public class MathInterprete {
 		}else{
 			String[] split = spliterEspecial(txt,new char[]{'='});
 			if(split.length == 3 && split[1].equals("=")){
-				System.out.println("Asignacion");
 				//Es una operacion de asignacion
 				Operando op1 = null;
 				if(validVariableName(split[0])){
@@ -736,7 +735,6 @@ public class MathInterprete {
 	 * @return
 	 */
 	public static String[] spliterEspecial(String txt,char[] separadores){
-		txt.replaceAll("\n", "");
 		ArrayList<String> ret = new ArrayList<String>();
 		int lastPos = 0;
 		int lvl = 0;
@@ -780,6 +778,10 @@ public class MathInterprete {
 						lastPos = i+1;
 					}
 				}
+			}
+			if(txt.charAt(i) == ' ' && lvl == 0){
+				txt = txt.substring(0,i) + txt.substring(i+1);
+				i--;
 			}
 		}
 		ret.add(txt.substring(lastPos, txt.length()));
@@ -791,7 +793,6 @@ public class MathInterprete {
 	 * @return
 	 */
 	public static String[] spliter(String txt){
-		txt.replaceAll("\n", "");
 		ArrayList<String> ret = new ArrayList<String>();
 		int lastPos = 0;
 		int lvl = 0;
@@ -835,6 +836,10 @@ public class MathInterprete {
 						lastPos = i+1;
 					}
 				}
+			}
+			if(txt.charAt(i) == ' ' && lvl == 0){
+				txt = txt.substring(0,i) + txt.substring(i+1);
+				i--;
 			}
 		}
 		ret.add(txt.substring(lastPos, txt.length()));

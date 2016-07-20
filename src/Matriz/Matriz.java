@@ -269,8 +269,8 @@ public class Matriz implements  Cloneable{
 	public ValorNumerico min(){
 		ValorNumerico min = matriz[0][0];
 		for (int i = 0; i < matriz.length ; i++) {
-			for (int j = 0; j < matriz[0].length - 1; j++) {
-				min = min.compareTo(matriz[i][j]) == 1 ? matriz[i][j] : min;
+			for (int j = 0; j < matriz[0].length; j++) {
+				min = (min.compareTo(matriz[i][j]) == 1 ? matriz[i][j] : min);
 			}
 		}
 		return (ValorNumerico) min.clone();

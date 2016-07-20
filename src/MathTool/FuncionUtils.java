@@ -1,6 +1,7 @@
 package MathTool;
 
 import Matriz.Matriz;
+import Matriz.MatrizException;
 import Operaciones.Operacion;
 import Operaciones.Operando;
 import Operaciones.Resultado;
@@ -27,6 +28,7 @@ public class FuncionUtils {
 	public static final int LOG10 = 15;
 	public static final int FACTORIAL = 16;
 	public static final int TRANSPOSE = 17;
+	public static final int MATRIX_INT = 18;
 	
 	public static Object ejecutar(int id,Operando[] ops) throws InterpreteException{
 		switch(id){
@@ -64,6 +66,8 @@ public class FuncionUtils {
 			return factorial(ops);
 		case TRANSPOSE:
 			return transpose(ops);
+		case MATRIX_INT:
+			return matrixIntegration(ops);
 		}
 		return null;
 	}
@@ -331,7 +335,7 @@ public class FuncionUtils {
 				throw new InterpreteException("Crash Error in abs()");
 			}
 		}else{
-			throw new InterpreteException("Needed only 1 argument");
+			throw new InterpreteException(InterpreteException.generateArgumentNumberError("1"));
 		}
 	}
 	public static Object pow(Operando[] ops) throws InterpreteException{
@@ -348,12 +352,12 @@ public class FuncionUtils {
 				throw new InterpreteException("Crash Error in pow()");
 			}
 		}else{
-			throw new InterpreteException("Needed only 2 argument");
+			throw new InterpreteException(InterpreteException.generateArgumentNumberError("2"));
 		}
 	}
 	public static Object factorial(Operando[] ops) throws InterpreteException{
 		if(ops.length == 2){
-			if(ops[1].getTipo() == Operando.VALOR_NUMERICO && ops[2].getTipo() == Operando.VALOR_NUMERICO){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
 				try {
 					return ((ValorNumerico)ops[1].getValor()).factorial();
 				} catch (ValorNumericoException e) {
@@ -369,7 +373,7 @@ public class FuncionUtils {
 				throw new InterpreteException("Crash Error in factorial()");
 			}
 		}else{
-			throw new InterpreteException("Needed only 1 argument");
+			throw new InterpreteException(InterpreteException.generateArgumentNumberError("1"));
 		}
 	}
 	public static Object transpose(Operando[] ops) throws InterpreteException{
@@ -388,7 +392,48 @@ public class FuncionUtils {
 				throw new InterpreteException("Crash Error in transpose()");
 			}
 		}else{
-			throw new InterpreteException("Needed only 1 argument");
+			throw new InterpreteException(InterpreteException.generateArgumentNumberError("1"));
+		}
+	}
+	public static Object matrixIntegration(Operando[] ops) throws InterpreteException{
+		if(ops.length >= 3 && ops.length <=4){
+			boolean operar = true;
+			for (int i = 1; i < ops.length; i++) {
+				if(ops[i].getTipo() != Operando.MATRIZ){
+					operar = false;
+				}
+			}
+			Matriz matY = (Matriz) ops[1].getValor();
+			Matriz matX = (Matriz) ops[2].getValor();
+			ValorNumerico[] pos = new ValorNumerico[2];
+			//Obtener intervalo de integracion
+			if(ops.length == 4){
+				Matriz matInt = (Matriz) ops[3].getValor();
+				pos[0] = matInt.get(new int[]{0,0});
+				pos[0] = matInt.get(new int[]{0,matInt.dimensions()[1]-1});
+			}else{
+				pos[0] = matX.get(new int[]{0,0});
+				pos[0] = matX.get(new int[]{0,matX.dimensions()[1]-1});
+			}
+			ValorNumerico ret = new ValorNumerico(0);
+			for (int i = 0; i < matX.dimensions()[1]-1; i++) {
+				int[] position = new int[]{0,i};
+				try {
+					Matriz valX = matX.getSubMatriz(new int[]{0,1,0}, new int[]{i,1,i+1});
+					Matriz valY = matY.getSubMatriz(new int[]{0,1,0}, new int[]{i,1,i+1});
+					ret = ret.add(
+							(matX.get(new int[]{0,i+1}).substract((matX.get(position))))
+							.multiply(
+									((valY.max().substract(valY.min()))
+									.divide(new ValorNumerico(2)))
+									.add((valY.min()))));
+				} catch (Exception e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}
+			return ret;
+		}else{
+			throw new InterpreteException(InterpreteException.generateArgumentNumberError("2"));
 		}
 	}
 }

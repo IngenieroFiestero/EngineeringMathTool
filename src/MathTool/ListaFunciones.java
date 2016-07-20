@@ -48,6 +48,7 @@ public class ListaFunciones {
 		lista.add(new Funcion("log10",FuncionUtils.LOG10));
 		lista.add(new Funcion("abs",FuncionUtils.ABS));
 		lista.add(new Funcion("transpose",FuncionUtils.TRANSPOSE));
+		lista.add(new Funcion("matrixIntegration",FuncionUtils.MATRIX_INT));
 		return new ListaFunciones(lista);
 	}
 	public void addFuncion(Funcion fun){

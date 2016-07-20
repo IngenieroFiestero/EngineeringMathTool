@@ -27,6 +27,7 @@ public class InterpreteException extends Exception{
 		map.put(4, "Alredy exists a variable with the name: " + SPLITER);
 		map.put(5, "Bad number of matrix tokens: \"[]\"");
 		map.put(6, "Bad number of function tokens: \"()\"");
+		map.put(7, "Needed only " + SPLITER + " arguments");
 		return map;
 	}
 	
@@ -47,6 +48,11 @@ public class InterpreteException extends Exception{
 		String[] vec = algo.split(SPLITER);
 		String ret = vec[0]+name;
 		return ret;
+	}
+	public static String generateArgumentNumberError(String name){
+		String algo = (String) codigos.get(1);
+		String[] vec = algo.split(SPLITER);
+		return vec[0] + name +vec[1];
 	}
 	public static String notImplementedError(){
 		return codigos.get(3);
