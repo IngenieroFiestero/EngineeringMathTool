@@ -304,12 +304,15 @@ public class MathInterprete {
 		String name = getFunctionName(txt);
 		if(isFuncion(txt)){
 			String[] args = getArgs(txt);
-			Operando[] operandos = new Operando[args.length+1];
-			operandos[0] = new Operando(new Funcion(name));
+			LinkedList<Operando> opers = new LinkedList<Operando>();
+			opers.add(new Operando(new Funcion(name)));
 			for (int i = 0; i < args.length; i++) {
-				operandos[i+1] = new Operando(spliter(args[i]).length > 1 || hasMoreLevels(args[i])? getOperacion(args[i], op) : args[i]);
+				if(args[i] == null || args[i].equals("")){
+				}else{
+					opers.add(new Operando(spliter(args[i]).length > 1 || hasMoreLevels(args[i]) ? getOperacion(args[i], op) : args[i]));
+				}
 			}
-			Operacion operacion = new Operacion(operandos, Operador.EJECUTAR_FUNCION);
+			Operacion operacion = new Operacion(opers.toArray(new Operando[opers.size()]), Operador.EJECUTAR_FUNCION);
 			return operacion;
 		}else{
 			throw new InterpreteException("Not valid Function");
