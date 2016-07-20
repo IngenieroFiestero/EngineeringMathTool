@@ -20,6 +20,13 @@ public class FuncionUtils {
 	public static final int ASIN = 9;
 	public static final int ACOS = 10;
 	public static final int ATAN = 11;
+	public static final int ABS = 12;
+	public static final int POW = 13;
+	public static final int LOG = 14;
+	public static final int LN = 14;
+	public static final int LOG10 = 15;
+	public static final int FACTORIAL = 16;
+	public static final int TRANSPOSE = 17;
 	
 	public static Object ejecutar(int id,Operando[] ops) throws InterpreteException{
 		switch(id){
@@ -45,6 +52,18 @@ public class FuncionUtils {
 			return acos(ops);
 		case ATAN:
 			return atan(ops);
+		case LOG:
+			return log(ops);
+		case LOG10:
+			return log10(ops);
+		case ABS:
+			return abs(ops);
+		case POW:
+			return pow(ops);
+		case FACTORIAL:
+			return factorial(ops);
+		case TRANSPOSE:
+			return transpose(ops);
 		}
 		return null;
 	}
@@ -236,7 +255,6 @@ public class FuncionUtils {
 		}
 	}
 	public static Object atan(Operando[] ops) throws InterpreteException{
-		ValorNumerico val = (ValorNumerico)ops[1].getValor();
 		if(ops.length == 2){
 			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
 				try {
@@ -252,6 +270,122 @@ public class FuncionUtils {
 				}
 			}else{
 				throw new InterpreteException("Crash Error in atan()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	public static Object log(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				try {
+					return ((ValorNumerico)ops[1].getValor()).log();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				try {
+					return ((Matriz)ops[1].getValor()).log();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else{
+				throw new InterpreteException("Crash Error in log()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	public static Object log10(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				try {
+					return ((ValorNumerico)ops[1].getValor()).log10();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				try {
+					return ((Matriz)ops[1].getValor()).log10();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else{
+				throw new InterpreteException("Crash Error in log10()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	public static Object abs(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				return ((ValorNumerico)ops[1].getValor()).abs();
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				try {
+					return ((Matriz)ops[1].getValor()).abs();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else{
+				throw new InterpreteException("Crash Error in abs()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	public static Object pow(Operando[] ops) throws InterpreteException{
+		if(ops.length == 3){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO && ops[2].getTipo() == Operando.VALOR_NUMERICO){
+				try {
+					return ((ValorNumerico)ops[1].getValor()).pow((ValorNumerico)ops[2].getValor());
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				throw new InterpreteException(InterpreteException.notImplementedError() + " pow([])");
+			}else{
+				throw new InterpreteException("Crash Error in pow()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 2 argument");
+		}
+	}
+	public static Object factorial(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO && ops[2].getTipo() == Operando.VALOR_NUMERICO){
+				try {
+					return ((ValorNumerico)ops[1].getValor()).factorial();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				try {
+					return ((Matriz)ops[1].getValor()).factorial();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else{
+				throw new InterpreteException("Crash Error in factorial()");
+			}
+		}else{
+			throw new InterpreteException("Needed only 1 argument");
+		}
+	}
+	public static Object transpose(Operando[] ops) throws InterpreteException{
+		if(ops.length == 2){
+			if(ops[1].getTipo() == Operando.VALOR_NUMERICO){
+				
+				return ((ValorNumerico)ops[1].getValor());
+			}else if(ops[1].getTipo() == Operando.MATRIZ){
+				try {
+					
+					return ((Matriz)ops[1].getValor()).transpose();
+				} catch (ValorNumericoException e) {
+					throw new InterpreteException(e.getMessage());
+				}
+			}else{
+				throw new InterpreteException("Crash Error in transpose()");
 			}
 		}else{
 			throw new InterpreteException("Needed only 1 argument");

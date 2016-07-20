@@ -42,10 +42,10 @@ public class Test {
 			ExpresionInterpretada eiAux2 = mi.evaluarExpresion("x=atan(sin(pi/3)/cos(pi/3))");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 			System.out.println("----------------------------------");
-			eiAux2 = mi.evaluarExpresion("x=sin(pi)");
+			eiAux2 = mi.evaluarExpresion("ln(e^(2))");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 			System.out.println("----------------------------------");
-			eiAux2 = mi.evaluarExpresion("x=5.0001-2.01");
+			eiAux2 = mi.evaluarExpresion("ans+4");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 		} catch (InterpreteException e) {
 			// TODO Auto-generated catch block

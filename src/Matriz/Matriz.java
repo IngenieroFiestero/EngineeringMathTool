@@ -113,7 +113,19 @@ public class Matriz implements  Cloneable{
 	}
 
 	public void set(int[] i, ValorNumerico val) {
-		matriz[i[0]][i[1]] = val;
+		matriz[i[0]][i[1]] = (ValorNumerico) val.clone();
+	}
+	public void set(int[] i, Matriz mat) throws MatrizException {
+		int[] dim = mat.dimensions();
+		if(i[0] + dim[0] <= matriz.length && i[1] + dim[1] <= matriz[0].length){
+			for (int j = i[0]; j < i[0] + dim[0]; j++) {
+				for (int j2 = i[1]; j2 < i[1] + dim[1]; j2++) {
+					matriz[j][j2] = (ValorNumerico) mat.get(new int[]{j-i[0],j2-i[1]}).clone();
+				}
+			}
+		}else{
+			throw new MatrizException("Error de dimensiones");
+		}
 	}
 
 	public ValorNumerico get(int[] i) {
@@ -137,6 +149,13 @@ public class Matriz implements  Cloneable{
 		for (int i = 0; i < matriz.length; i++) {
 			for (int j = 0; j < matriz[0].length; j++) {
 				matriz[i][j].setNull();
+			}
+		}
+	}
+	public void ones(){
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				matriz[i][j] = ValorNumerico.ONE;
 			}
 		}
 	}
@@ -175,11 +194,20 @@ public class Matriz implements  Cloneable{
 		}
 		return ret;
 	}
+	public Matriz transpose() throws ValorNumericoException{
+		Matriz mat = new Matriz(dimensions());
+		for (int i = 0; i < matriz.length ; i++) {
+			for (int j = 0; j < matriz[0].length ; j++) {
+				mat.matriz[i][j]=matriz[j][i];
+			}
+		}
+		return mat;
+	}
 	public Matriz sin() throws ValorNumericoException{
 		Matriz mat = new Matriz(dimensions());
 		for (int i = 0; i < matriz.length ; i++) {
 			for (int j = 0; j < matriz[0].length ; j++) {
-				mat.set(new int[]{i, j},matriz[i][j].sin());
+				mat.matriz[i][j] = matriz[i][j].sin();
 			}
 		}
 		return mat;
@@ -188,7 +216,7 @@ public class Matriz implements  Cloneable{
 		Matriz mat = new Matriz(dimensions());
 		for (int i = 0; i < matriz.length ; i++) {
 			for (int j = 0; j < matriz[0].length ; j++) {
-				mat.set(new int[]{i, j},matriz[i][j].asin());
+				mat.matriz[i][j] = matriz[i][j].asin();
 			}
 		}
 		return mat;
@@ -197,7 +225,7 @@ public class Matriz implements  Cloneable{
 		Matriz mat = new Matriz(dimensions());
 		for (int i = 0; i < matriz.length ; i++) {
 			for (int j = 0; j < matriz[0].length ; j++) {
-				mat.set(new int[]{i, j},matriz[i][j].cos());
+				mat.matriz[i][j] = matriz[i][j].cos();
 			}
 		}
 		return mat;
@@ -206,7 +234,7 @@ public class Matriz implements  Cloneable{
 		Matriz mat = new Matriz(dimensions());
 		for (int i = 0; i < matriz.length ; i++) {
 			for (int j = 0; j < matriz[0].length ; j++) {
-				mat.set(new int[]{i, j},matriz[i][j].acos());
+				mat.matriz[i][j] = matriz[i][j].acos();
 			}
 		}
 		return mat;
@@ -215,7 +243,7 @@ public class Matriz implements  Cloneable{
 		Matriz mat = new Matriz(dimensions());
 		for (int i = 0; i < matriz.length ; i++) {
 			for (int j = 0; j < matriz[0].length ; j++) {
-				mat.set(new int[]{i, j},matriz[i][j].tan());
+				mat.matriz[i][j] = matriz[i][j].tan();
 			}
 		}
 		return mat;
@@ -224,7 +252,7 @@ public class Matriz implements  Cloneable{
 		Matriz mat = new Matriz(dimensions());
 		for (int i = 0; i < matriz.length ; i++) {
 			for (int j = 0; j < matriz[0].length ; j++) {
-				mat.set(new int[]{i, j},matriz[i][j].atan());
+				mat.matriz[i][j] = matriz[i][j].atan();
 			}
 		}
 		return mat;
@@ -268,12 +296,29 @@ public class Matriz implements  Cloneable{
 		if (Arrays.equals(dim1, dim2)) {
 			for (int i = 0; i < dim1[0]; i++) {
 				for (int j = 0; j < dim1[1]; j++) {
-					ret.set(new int[] { i, j },matriz[i][j].add(mat.get(new int[] { i, j })));
+					ret.matriz[i][j] = matriz[i][j].add(mat.matriz[i][j]);
 				}
 			}
 			return ret;
 		} else {
-			throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
+			if(dim1[0] == dim2[0] && dim1[0] == 1){
+				ret = new Matriz(new int[]{1,Math.max(dim1[1], dim2[1])});
+				if(dim1[1] > dim2[1]){
+					//El mas pequeño se redimensiona
+					for (int i = 0; i < dim1[1]; i++) {
+						ret.set(new int[]{0,i}, mat.get(new int[]{0,i}));
+					}
+					ret = ret.sumar(this);
+				}else{
+					for (int i = 0; i < dim2[1]; i++) {
+						ret.set(new int[]{0,i}, this.get(new int[]{0,i}));
+					}
+					ret = ret.sumar(mat);
+				}
+				return ret;
+			}else{
+				throw new MatrizException(MatrizException.generateErrorDimensions(dim1,dim2));
+			}
 		}
 	}
 	public Matriz restar(Matriz mat) throws MatrizException, ValorNumericoException {
@@ -283,7 +328,7 @@ public class Matriz implements  Cloneable{
 		if (Arrays.equals(dim1, dim2)) {
 			for (int i = 0; i < dim1[0]; i++) {
 				for (int j = 0; j < dim1[1]; j++) {
-					ret.set(new int[] { i, j },matriz[i][j].substract(mat.get(new int[] { i, j })));
+					ret.matriz[i][j] = this.matriz[i][j].substract(mat.matriz[i][j]);
 				}
 			}
 			return ret;
@@ -385,7 +430,7 @@ public class Matriz implements  Cloneable{
 			Matriz ret = new Matriz(dim2);
 			for (int i = 0; i < dim1[0]; i++) {
 				for (int j = 0; j < dim1[1]; j++) {
-					ret.set(new int[]{i,j},matriz[0][0].multiply(mat.get(new int[]{i,j})));
+					ret.matriz[i][j] = matriz[0][0].multiply(mat.matriz[i][j]);
 				}
 			}
 			return ret;
@@ -394,7 +439,7 @@ public class Matriz implements  Cloneable{
 			Matriz ret = new Matriz(dim1);
 			for (int i = 0; i < dim1[0]; i++) {
 				for (int j = 0; j < dim1[1]; j++) {
-					ret.set(new int[]{i,j},matriz[i][j].multiply(mat.get(new int[]{0,0})));
+					ret.matriz[i][j] = matriz[i][j].multiply(mat.matriz[0][0]);
 				}
 			}
 			return ret;
@@ -417,6 +462,71 @@ public class Matriz implements  Cloneable{
 		for (int i = 0; i < matriz.length; i++) {
 			for (int j = 0; j < matriz[0].length; j++) {
 				mat.matriz[i][j] = matriz[i][j].sqrt();
+			}
+		}
+		return mat;
+	}
+	public Matriz log() throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].log();
+			}
+		}
+		return mat;
+	}
+	public Matriz log10() throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].log10();
+			}
+		}
+		return mat;
+	}
+	public Matriz abs() throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].abs();
+			}
+		}
+		return mat;
+	}
+	public Matriz pow(ValorNumerico val) throws  MatrizException, ValorNumericoException{
+		if(val.getImaginario() != 0){
+			throw new MatrizException("Cant pow to imaginary");
+		}
+		if(val.getReal()%1 != 0){
+			throw new MatrizException("Cant pow to float number");
+		}
+		if(matriz.length != matriz[0].length){
+			throw new MatrizException("Cant pow a non square matrix");
+		}
+		Matriz ret = (Matriz) this.clone();
+		if(val.getReal() == 0){
+			ret.ones();
+			return ret;
+		}
+		for (int i = 2; i < val.getReal(); i++) {
+			ret = ret.multiplicar(this);
+		}
+		return ret;
+	}
+	public Matriz powP2P(Matriz val) throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].pow(val.matriz[i][j]);
+			}
+		}
+		return mat;
+	}
+	public Matriz powP2P(ValorNumerico val) throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].pow(val);
 			}
 		}
 		return mat;
@@ -474,6 +584,15 @@ public class Matriz implements  Cloneable{
 			fil++;
 		}
 		return ret;
+	}
+	public Matriz factorial() throws ValorNumericoException{
+		Matriz mat = (Matriz) this.clone();
+		for (int i = 0; i < matriz.length; i++) {
+			for (int j = 0; j < matriz[0].length; j++) {
+				mat.matriz[i][j] = matriz[i][j].factorial();
+			}
+		}
+		return mat;
 	}
 	public static Matriz load(InputStream is) throws IOException{
 		DataInputStream dis = new DataInputStream(is);

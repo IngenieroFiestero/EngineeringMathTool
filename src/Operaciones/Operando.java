@@ -49,26 +49,28 @@ public class Operando {
 				this.operando = new Variable(txt);
 			}else{
 				try {
-					this.operando = new ValorNumerico(txt);
-					this.tipo = VALOR_NUMERICO;
-				} catch (ValorNumericoException e) {
+					Matriz mat = new Matriz(txt);
+					this.operando = mat;
+					this.tipo = MATRIZ;
+				} catch (MatrizException e1) {
 					try {
-						Matriz mat = new Matriz(txt);
-						this.operando = mat;
-						this.tipo = MATRIZ;
-					} catch (MatrizException e1) {
+						this.operando = new ValorNumerico(txt);
+						this.tipo = VALOR_NUMERICO;
+					} catch (ValorNumericoException e) {
 						this.tipo = EXPRESION;
 						this.operando = operando;
-						/*try {
-							MatrizExpresion me = new MatrizExpresion(txt);
-							this.operando = me;
-							this.tipo = MATRIZ_EXPRESION;
-						} catch (MatrizException e2) {
-							this.tipo = EXPRESION;
-							this.operando = operando;
-						}*/
 					}
+					
+					/*try {
+						MatrizExpresion me = new MatrizExpresion(txt);
+						this.operando = me;
+						this.tipo = MATRIZ_EXPRESION;
+					} catch (MatrizException e2) {
+						this.tipo = EXPRESION;
+						this.operando = operando;
+					}*/
 				}
+				
 			}
 		}else if(operando instanceof Integer){
 			this.tipo = RESULTADO;

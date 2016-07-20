@@ -211,7 +211,29 @@ public class MathInterprete {
 							if(split[1].equals("%")){
 								
 							}else if(split[1].equals("^")){
-								
+								String op2 = "";
+								String op1 = split[0];
+								for (int j = 2; j < split.length; j++) {
+									op2 = op2 + split[j];
+								}
+								Operacion op = new Operacion(new Operando[]{
+										new Operando(spliter(op1).length > 1 || hasMoreLevels(op1)||validVariableName(op1) ? getOperacion(op1, ops) : op1),
+										new Operando(spliter(op2).length > 1 || hasMoreLevels(op2) ||validVariableName(op2) ? getOperacion(op2, ops) : op2)
+								},Operador.EXPONENTE);
+								op.setId(ops.insert(op));
+								return op;
+							}else if(split[1].equals(".^")){
+								String op2 = "";
+								String op1 = split[0];
+								for (int j = 2; j < split.length; j++) {
+									op2 = op2 + split[j];
+								}
+								Operacion op = new Operacion(new Operando[]{
+										new Operando(spliter(op1).length > 1 || hasMoreLevels(op1)||validVariableName(op1) ? getOperacion(op1, ops) : op1),
+										new Operando(spliter(op2).length > 1 || hasMoreLevels(op2) ||validVariableName(op2) ? getOperacion(op2, ops) : op2)
+								},Operador.EXPONENTE_P2P);
+								op.setId(ops.insert(op));
+								return op;
 							}else{
 								throw new InterpreteException("Not valid argument");
 							}
@@ -219,8 +241,17 @@ public class MathInterprete {
 							throw new InterpreteException("Not enough arguments for % or ^");
 						}
 					}else if(lvl == 3){
-						split = spliterEspecial(txt, new char[]{'\''});
-						lvl++;
+						if(txt.charAt(txt.length()-1) == '\''){
+							Operacion op = llamarOperacion("transpose("+txt.substring(0,txt.length()-1)+")",ops);
+							op.setId(ops.insert(op));
+							return op;
+						}else if(txt.charAt(txt.length()-1) == '!'){
+							Operacion op = llamarOperacion("factorial("+txt.substring(0,txt.length()-1)+")",ops);
+							op.setId(ops.insert(op));
+							return op;
+						}else{
+							lvl++;
+						}
 					}else if(lvl == 4){
 						//Funciones
 						if(isFuncion(txt)){
@@ -244,14 +275,19 @@ public class MathInterprete {
 						}
 					}else if(lvl == 6){
 						//Operaciones dentro de parentesis etc
-						String txt2 = innerExpresion(txt);
-						if(txt2 == null){
-							lvl++;
+						if(txt.charAt(0) == '[' && txt.charAt(txt.length()-1) == ']'){
+							Operacion op = new Operacion(new Operando[]{new Operando(txt)}, Operador.EVALUACION);
+							op.setId(ops.insert(op));
+							return op;
 						}else{
-							System.out.println("Parentesis");
-							return getOperacion(txt2, ops);
+							String txt2 = innerExpresion(txt);
+							if(txt2 == null){
+								lvl++;
+							}else{
+								System.out.println("Parentesis");
+								return getOperacion(txt2, ops);
+							}
 						}
-						
 					}else{
 						System.out.println("Es un numero");
 						Operacion op = new Operacion(new Operando[]{new Operando(txt)}, Operador.EVALUACION);
@@ -402,6 +438,7 @@ public class MathInterprete {
 		Operando[] opd = op.getOperandos();
 		int operador = op.getOperador();
 		Operando[] aux = null;
+		Object valor = null;
 		switch (operador) {
 		case Operador.ASIGNACION:
 			//Operacion de asignacion
@@ -414,7 +451,7 @@ public class MathInterprete {
 						aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
 					}
 					Variable var = new Variable(name);
-					Object valor = aux[1].getValor();
+					valor = aux[1].getValor();
 					try {
 						var.setValor(valor);
 						op.getResultado().setValor(valor);
@@ -441,7 +478,9 @@ public class MathInterprete {
 			try {
 				op.getResultado().setValor(Operador.suma(aux[0], aux[1]));
 				if(op.getId() == lo.size()-1){
-					ret = ret + op.getResultado().getValor()+"\n";
+					valor = op.getResultado().getValor();
+					ret = ret + valor+"\n";
+					this.contexto.setVariableValue("ans", valor);
 				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
@@ -458,7 +497,9 @@ public class MathInterprete {
 			try {
 				op.getResultado().setValor(Operador.resta(aux[0], aux[1]));
 				if(op.getId() == lo.size()-1){
-					ret = ret + op.getResultado().getValor()+"\n";
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
 				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
@@ -475,7 +516,28 @@ public class MathInterprete {
 			try {
 				op.getResultado().setValor(Operador.multiplicacion(aux[0], aux[1]));
 				if(op.getId() == lo.size()-1){
-					ret = ret + op.getResultado().getValor()+"\n";
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
+				}
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.MULTIPLICACION_P2P:
+			//Operacion multiplicacion
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+			}
+			try {
+				op.getResultado().setValor(Operador.multiplicacionP2P(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
 				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
@@ -493,7 +555,47 @@ public class MathInterprete {
 				System.out.println("Division: " + aux[0] +" " +aux[1]);
 				op.getResultado().setValor(Operador.division(aux[0], aux[1]));
 				if(op.getId() == lo.size()-1){
-					ret = ret + op.getResultado().getValor() +"\n";
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
+				}
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.EXPONENTE:
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			for (int i = 0; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+			}
+			try {
+				op.getResultado().setValor(Operador.exponente(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
+				}
+			} catch (Exception e) {
+				throw new InterpreteException(e.getMessage());
+			}
+			break;
+		case Operador.EXPONENTE_P2P:
+			opd = op.getOperandos();
+			aux = new Operando[opd.length];
+			aux[0] = opd[0];
+			for (int i = 1; i < opd.length; i++) {
+				//Asignamos de verdad los valores para no tener que castear manualmente
+				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
+				System.out.println(aux[i]);
+			}
+			try {
+				op.getResultado().setValor(Operador.exponenteP2P(aux[0], aux[1]));
+				if(op.getId() == lo.size()-1){
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
 				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
@@ -506,12 +608,13 @@ public class MathInterprete {
 			for (int i = 1; i < opd.length; i++) {
 				//Asignamos de verdad los valores para no tener que castear manualmente
 				aux[i] = new Operando(asignarValores(opd[i], this.contexto, lo));
-				System.out.println(aux[i]);
 			}
 			try {
 				op.getResultado().setValor(Operador.ejecutarFuncion(aux, this.contexto));
 				if(op.getId() == lo.size()-1){
-					ret = ret + op.getResultado().getValor()+"\n";
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
 				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());
@@ -527,7 +630,9 @@ public class MathInterprete {
 			try {
 				op.getResultado().setValor(aux[0].getValor());
 				if(op.getId() == lo.size()-1){
-					ret = ret + op.getResultado().getValor()+"\n";
+					valor = op.getResultado().getValor();
+					ret = ret + valor +"\n";
+					this.contexto.setVariableValue("ans", valor);
 				}
 			} catch (Exception e) {
 				throw new InterpreteException(e.getMessage());

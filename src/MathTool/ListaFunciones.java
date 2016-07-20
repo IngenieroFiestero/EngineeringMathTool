@@ -41,6 +41,13 @@ public class ListaFunciones {
 		lista.add(new Funcion("asin",FuncionUtils.ASIN));
 		lista.add(new Funcion("acos",FuncionUtils.ACOS));
 		lista.add(new Funcion("atan",FuncionUtils.ATAN));
+		lista.add(new Funcion("pow",FuncionUtils.POW));
+		lista.add(new Funcion("factorial",FuncionUtils.FACTORIAL));
+		lista.add(new Funcion("log",FuncionUtils.LOG));
+		lista.add(new Funcion("ln",FuncionUtils.LN));
+		lista.add(new Funcion("log10",FuncionUtils.LOG10));
+		lista.add(new Funcion("abs",FuncionUtils.ABS));
+		lista.add(new Funcion("transpose",FuncionUtils.TRANSPOSE));
 		return new ListaFunciones(lista);
 	}
 	public void addFuncion(Funcion fun){

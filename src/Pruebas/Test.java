@@ -7,7 +7,7 @@ public class Test {
 	public static void main(String[] args){
 		ValorNumerico val = null;
 		try {
-			val = new ValorNumerico("5.1");
+			val = new ValorNumerico("5.1000001");
 		} catch (ValorNumericoException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -21,7 +21,7 @@ public class Test {
 			e1.printStackTrace();
 		}
 		val.simplificarReal();
-		System.out.println(val.toString());
+		System.out.println("Val1 simpli "+val.toString());
 		System.out.println("Resultado suma: " + val.resta(val2));
 		ValorNumerico prueba = null;
 		try {

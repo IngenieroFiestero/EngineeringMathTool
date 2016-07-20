@@ -235,7 +235,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 	}
 
 	public Object clone() {
-		return new ValorNumerico(this.real, this.imaginario);
+		return new ValorNumerico(this.real, this.imaginario,this.denominador);
 	}
 
 	public ValorNumerico negate() {
@@ -445,7 +445,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 
 	public ValorNumerico sin() throws ValorNumericoException {
 		if (imaginario != 0) {
-			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sin()"));
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sin(i)"));
 		}
 		if (real == 0) {
 			return new ValorNumerico(0.0);
@@ -487,14 +487,14 @@ public class ValorNumerico implements Cloneable, Serializable {
 
 	public ValorNumerico asin() throws ValorNumericoException {
 		if (imaginario != 0) {
-			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sin()"));
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("sin(i)"));
 		}
 		return new ValorNumerico(Math.asin(real / denominador));
 	}
 
 	public ValorNumerico cos() throws ValorNumericoException {
 		if (imaginario != 0) {
-			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("cos()"));
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("cos(i)"));
 		}
 		if (real == 0) {
 			return new ValorNumerico(0.0);
@@ -538,23 +538,68 @@ public class ValorNumerico implements Cloneable, Serializable {
 
 	public ValorNumerico acos() throws ValorNumericoException {
 		if (imaginario != 0) {
-			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("cos()"));
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("cos(i)"));
 		}
 		return new ValorNumerico(Math.acos(real / denominador));
 	}
 
 	public ValorNumerico tan() throws ValorNumericoException {
 		if (imaginario != 0) {
-			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("tan()"));
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("tan(i)"));
 		}
 		return new ValorNumerico(Math.tan(real / denominador));
 	}
 
 	public ValorNumerico atan() throws ValorNumericoException {
 		if (imaginario != 0) {
-			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("tan()"));
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("tan(i)"));
 		}
 		System.out.println("ATAN: " + real + " " + imaginario + " " + denominador);
 		return new ValorNumerico(Math.atan(real / denominador));
+	}
+	public ValorNumerico log10() throws ValorNumericoException{
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("log(i)"));
+		}
+		return new ValorNumerico(Math.log10(real / denominador));
+	}
+	public ValorNumerico log() throws ValorNumericoException{
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("ln()"));
+		}
+		return new ValorNumerico(Math.log(real / denominador));
+	}
+	public ValorNumerico pow(ValorNumerico val) throws ValorNumericoException{
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("^i"));
+		}
+		double mult = Math.pow(real/denominador, val.real);
+		double trig = (val.imaginario/val.denominador)*Math.log(real/this.denominador);
+		ValorNumerico num = null;
+		if(trig == 0){
+			num = new ValorNumerico(mult,0,1);
+		}else{
+			num = new ValorNumerico(mult*Math.cos(trig),mult*Math.sin(trig),Math.pow(denominador, val.real));
+		}
+		return num;
+	}
+	public ValorNumerico abs(){
+		return new ValorNumerico(Math.sqrt(this.real*this.real + this.imaginario*this.imaginario),0,this.denominador);
+	}
+	public ValorNumerico factorial() throws ValorNumericoException{
+		if (imaginario != 0) {
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("i!"));
+		}
+		double num = real/denominador;
+		if(num%1 != 0){
+			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("Must be a integer"));
+		}
+		double ret = 1;
+		while (num > 0) {
+			ret =ret * num;
+			num = num -1;
+			
+		}
+		return new ValorNumerico(ret);
 	}
 }

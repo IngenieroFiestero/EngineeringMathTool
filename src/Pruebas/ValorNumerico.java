@@ -90,6 +90,7 @@ public class ValorNumerico{
 			long imag = (this.imaginario)*(imagDen/this.imaginarioDenominador) + (val.imaginario)*(imagDen/val.imaginarioDenominador);
 			return new ValorNumerico(real,imag,realDen,imagDen);
 		}catch(Exception e){
+			e.printStackTrace();
 			simplificarReal();
 			simplificarImaginario();
 			val.simplificarReal();
@@ -242,13 +243,15 @@ public class ValorNumerico{
     				divisores.add(i);
     				numAux=numAux/i;
     			}
-                if(i > 2){
-    				i++;
-    			}
+                
                  if(numAux==1){
                     salir = true;
                 }
+                 
             }
+			if(i > 2){
+				i++;
+			}
 			
 		}
 		return divisores;
