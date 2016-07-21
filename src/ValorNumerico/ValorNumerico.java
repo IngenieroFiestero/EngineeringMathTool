@@ -57,21 +57,21 @@ public class ValorNumerico implements Cloneable, Serializable {
 		char suma = '+';
 		String numb = "";
 		for (int i = 0; i <numero.length(); i++) {
-			if(numero.charAt(i) >= '0' && numero.charAt(i) <='9'){
+			if((numero.charAt(i) >= '0' && numero.charAt(i) <='9') || numero.charAt(i) == '.'){
 				numb = numb + numero.charAt(i);
 			}else{
 				if(numero.charAt(i) == '+'){
-					if(!findimag){
-						real = numb;
-					}
 					suma = '+';
-					numb = "";
-				}else if(numero.charAt(i) == '-'){
-					if(!findimag){
-						real = numb;
+					if(!findimag && i != 0 && !numb.equals("")){
+						real = suma + numb;
+						numb = "";
 					}
+				}else if(numero.charAt(i) == '-'){
 					suma = '-';
-					numb = "";
+					if(!findimag && i != 0 && !numb.equals("")){
+						real = suma + numb;
+						numb = "";
+					}
 				}else if(numero.charAt(i) == 'i'){
 					if(numb.equals("")){
 						imagin = suma + "1";
@@ -84,7 +84,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 			}
 		}
 		if(!findimag && !findreal){
-			real = numb;
+			real = suma + numb;
 		}
 		if (!valid) {
 			throw new ValorNumericoException("Not Valid");
@@ -119,7 +119,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 			} else if (this.real == 0) {
 				return (this.imaginario / denominador) + "i";
 			} else {
-				return this.real / denominador + " " + (this.imaginario/this.denominador > 0 ? "+" : "")  + (this.imaginario/this.denominador == 1 ? "" : this.imaginario/this.denominador)+ "i";
+				return this.real / denominador + " " + (this.imaginario/this.denominador != 0 ? this.imaginario/this.denominador + "i" : "");
 			}
 		}
 
