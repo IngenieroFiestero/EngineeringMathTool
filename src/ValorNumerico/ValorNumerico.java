@@ -49,46 +49,54 @@ public class ValorNumerico implements Cloneable, Serializable {
 	}
 
 	public ValorNumerico(String numero) throws ValorNumericoException {
-		String[] valores = spliter(numero);
-		ArrayList<Integer> numeros = new ArrayList<Integer>();
 		boolean valid = true;
-		double imagin = 0;
-		double real = 0;
-		for (int i = 0; i < valores.length; i++) {
-			if (isNumber(valores[i])) {
-				numeros.add(new Integer(i));
-			} else if (valores[i].equals("i") || valores[i].equals("+") || valores[i].equals("-")
-					|| valores[i].equals(" ")) {
-			} else {
-				valid = false;
-			}
-		}
-		if (valores.length == 1 && valores[0].equals("i")) {
-			imagin = 1;
-		} else {
-			for (int i = 0; i < numeros.size(); i++) {
-				int pos = numeros.get(i);
-				if ((pos + 1) < valores.length && valores[pos + 1].equals(IMAGINARIO)) {
-					// HEMOS ENCONTRADO EL NUMERO IMAGINARIO
-					if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
-						imagin = Double.parseDouble(valores[pos - 1] + valores[pos]);
-					} else {
-						imagin = Double.parseDouble(valores[pos]);
+		String imagin = "";
+		String real = "";
+		boolean findreal = false;
+		boolean findimag = false;
+		char suma = '+';
+		String numb = "";
+		for (int i = 0; i <numero.length(); i++) {
+			if(numero.charAt(i) >= '0' && numero.charAt(i) <='9'){
+				numb = numb + numero.charAt(i);
+			}else{
+				if(numero.charAt(i) == '+'){
+					if(!findimag){
+						real = numb;
 					}
-				} else {
-					if ((pos - 1) >= 0 && isSign(valores[pos - 1])) {
-						real = Double.parseDouble(valores[pos - 1] + valores[pos]);
-					} else {
-						real = Double.parseDouble(valores[pos]);
+					suma = '+';
+					numb = "";
+				}else if(numero.charAt(i) == '-'){
+					if(!findimag){
+						real = numb;
 					}
+					suma = '-';
+					numb = "";
+				}else if(numero.charAt(i) == 'i'){
+					if(numb.equals("")){
+						imagin = suma + "1";
+					}else{
+						imagin = suma + numb;
+					}
+					numb = "";
+					findimag = true;
 				}
 			}
+		}
+		if(!findimag && !findreal){
+			real = numb;
 		}
 		if (!valid) {
 			throw new ValorNumericoException("Not Valid");
 		}
-		this.real = real;
-		this.imaginario = imagin;
+		if(!findimag){
+			imagin = "0";
+		}
+		if(real == null || real.equals("")){
+			real = "0";
+		}
+		this.real = Double.parseDouble(real);
+		this.imaginario = Double.parseDouble(imagin);
 		this.denominador = 1;
 	}
 
@@ -101,7 +109,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 			} else if (this.real == 0) {
 				return this.imaginario + "i";
 			} else {
-				return this.real + " " + (this.imaginario > 0 ? "+" : "") + this.imaginario + "i";
+				return this.real + " " + (this.imaginario > 0 ? "+" : "")  + (this.imaginario == 1 ? "" : this.imaginario)+ "i";
 			}
 		} else {
 			if (this.imaginario == 0) {
@@ -111,8 +119,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 			} else if (this.real == 0) {
 				return (this.imaginario / denominador) + "i";
 			} else {
-				return this.real / denominador + " " + (this.imaginario > 0 ? "+" : "") + this.imaginario / denominador
-						+ "i";
+				return this.real / denominador + " " + (this.imaginario/this.denominador > 0 ? "+" : "")  + (this.imaginario/this.denominador == 1 ? "" : this.imaginario/this.denominador)+ "i";
 			}
 		}
 

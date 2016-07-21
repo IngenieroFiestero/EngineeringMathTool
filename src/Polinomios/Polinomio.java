@@ -2,15 +2,22 @@ package Polinomios;
 
 import Matriz.Matriz;
 import Matriz.MatrizException;
+import ValorNumerico.ValorNumerico;
 import ValorNumerico.ValorNumericoException;
 
 public class Polinomio {
 	private Matriz polinomio;
 	
+	/**
+	 * 1 +2x^2 +3x^3
+	 * @param mat
+	 * @throws MatrizException
+	 */
 	public Polinomio(Matriz mat) throws MatrizException{
 		if(mat.dimensions()[0] != 1){
 			throw new MatrizException("Not valid dimension");
 		}
+		System.out.println(mat);
 		this.polinomio = mat;
 	}
 	public Matriz getPolinomio(){
@@ -64,8 +71,14 @@ public class Polinomio {
 		}
 		return new Polinomio(ret);
 	}
-	public Polinomio sustract(){
-		return null;
+	public ValorNumerico eval(ValorNumerico val) throws ValorNumericoException{
+		System.out.println("Val: " + val);
+		ValorNumerico ret = ValorNumerico.ZERO;
+		for (int i = 0; i < polinomio.dimensions()[1]; i++) {
+			ret = ret.add(polinomio.get(new int[]{0,i}).multiply(val.pow(new ValorNumerico(i))));
+			System.out.println(val.pow(new ValorNumerico(i)));
+		}
+		return ret;
 	}
 	public String toString(){
 		return polinomio.toString();
