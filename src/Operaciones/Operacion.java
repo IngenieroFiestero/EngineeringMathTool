@@ -81,7 +81,6 @@ public class Operacion{
 		int lngth = dis.readInt();
 		int id = dis.readInt();
 		//Cerramos este InputStream antes de continuar
-		dis.close();
 		Operando[] operandos = new Operando[lngth];
 		for (int i = 0; i < lngth; i++) {
 			operandos[i] = Operando.load(is);
@@ -99,7 +98,6 @@ public class Operacion{
 		//Escribimos el identificador de Operacion
 		daos.writeInt(this.id);;
 		//Cerramos este OutputStream antes de continuar
-		daos.close();
 		//Escribir todos los operandos
 		for (int i = 0; i < operandos.length; i++) {
 			operandos[i].save(os);

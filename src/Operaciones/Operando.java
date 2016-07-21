@@ -102,7 +102,6 @@ public class Operando {
 		}else if(tipo == RESULTADO){
 			ret = new Operando(new Integer(dis.readInt()));
 		}
-		dis.close();
 		switch (tipo) {
 		case VALOR_NUMERICO:
 			ret = new Operando(ValorNumerico.load(is));
@@ -112,6 +111,12 @@ public class Operando {
 			break;
 		case MATRIZ:
 			ret = new Operando(Matriz.load(is));
+			break;
+		case FUNCION:
+			ret = new Operando(Funcion.load(is));
+			break;
+		case RESULTADO:
+			ret = new Operando(new Integer(dis.readInt()));
 			break;
 		default:
 			break;
@@ -130,7 +135,6 @@ public class Operando {
 		}else if(this.tipo == EXPRESION){
 			dos.writeUTF(((String) this.operando));
 		}
-		dos.close();
 		switch (tipo) {
 		case VARIABLE:
 			((Variable) this.operando).save(os);
@@ -140,6 +144,12 @@ public class Operando {
 			break;
 		case MATRIZ:
 			((Matriz) this.operando).save(os);
+			break;
+		case FUNCION:
+			((Funcion)this.operando).save(os);
+			break;
+		case RESULTADO:
+			dos.writeInt(((Integer)this.operando).intValue());
 			break;
 		default:
 			break;

@@ -62,7 +62,6 @@ public class Variable {
 	public void save(OutputStream os) throws IOException{
 		DataOutputStream dos = new DataOutputStream(os);
 		dos.writeUTF(name);//Solo nos interesa el nombre
-		dos.close();
 	}
 	public byte[] toByte() throws IOException{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

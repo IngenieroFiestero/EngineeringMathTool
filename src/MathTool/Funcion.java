@@ -1,5 +1,11 @@
 package MathTool;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class Funcion {
 	private String name;
 	private Script codigo;
@@ -74,5 +80,13 @@ public class Funcion {
 	}
 	public String toString(){
 		return this.name;
+	}
+	public static Funcion load(InputStream is) throws IOException{
+		DataInputStream dis = new DataInputStream(is);
+		return new Funcion(dis.readUTF());
+	}
+	public void save(OutputStream os) throws IOException{
+		DataOutputStream dos = new DataOutputStream(os);
+		dos.writeUTF(this.name);
 	}
 }

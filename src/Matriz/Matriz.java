@@ -599,7 +599,6 @@ public class Matriz implements  Cloneable{
 		int fila = dis.readInt();
 		int col = dis.readInt();
 		Matriz ret = new Matriz(new int[]{fila,col});
-		dis.close();
 		for (int i = 0; i < fila; i++) {
 			for (int j = 0; j < col; j++) {
 				ret.set(new int[]{i,j}, ValorNumerico.load(is));

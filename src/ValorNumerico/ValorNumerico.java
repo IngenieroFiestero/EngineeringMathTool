@@ -411,7 +411,6 @@ public class ValorNumerico implements Cloneable, Serializable {
 		double real = dis.readDouble();
 		double imaginario = dis.readDouble();
 		double denominador = dis.readDouble();
-		dis.close();
 		return new ValorNumerico(real, imaginario, denominador);
 	}
 
@@ -421,8 +420,6 @@ public class ValorNumerico implements Cloneable, Serializable {
 		dos.writeDouble(real);
 		dos.writeDouble(imaginario);
 		dos.writeDouble(denominador);
-		dos.close();// Siempre mandar la informacion directamente al
-					// OutputStream al acabar
 	}
 
 	public byte[] getBytes() throws IOException {

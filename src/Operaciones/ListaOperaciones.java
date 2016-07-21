@@ -44,7 +44,6 @@ public class ListaOperaciones implements Serializable{
 		DataInputStream dis = new DataInputStream(is);
 		ListaOperaciones list = new ListaOperaciones();
 		int size = dis.readInt();
-		dis.close();
 		for (int i = 0; i < size; i++) {
 			list.insert(Operacion.load(is));
 		}
@@ -79,7 +78,6 @@ public class ListaOperaciones implements Serializable{
 	public synchronized void save(OutputStream os) throws IOException{
 		DataOutputStream daos = new DataOutputStream(os);
 		daos.writeInt(operaciones.size());
-		daos.close();
 		for (int i = 0; i < operaciones.size(); i++) {
 			operaciones.get(new Integer(i)).save(os);
 		}

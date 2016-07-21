@@ -54,6 +54,9 @@ public class ExpresionInterpretada{
 	public int getTipo(){
 		return this.tipo;
 	}
+	public void setTipo(int tipo){
+		this.tipo = tipo;
+	}
 	private void evaluarCondicion(){
 		
 	}
@@ -64,19 +67,11 @@ public class ExpresionInterpretada{
 	public ListaOperaciones getListaOperaciones(){
 		return this.operaciones;
 	}
-	public static Operacion load(InputStream is) throws IOException{
+	public static ExpresionInterpretada load(InputStream is) throws IOException{
 		DataInputStream dis = new DataInputStream(is);
-		int operador = dis.readInt();
-		int lngth = dis.readInt();
-		int id = dis.readInt();
-		//Cerramos este InputStream antes de continuar
-		dis.close();
-		Operando[] operandos = new Operando[lngth];
-		for (int i = 0; i < lngth; i++) {
-			operandos[i] = Operando.load(is);
-		}
-		Operacion ret = new Operacion(operandos,operador);
-		ret.setId(id);
+		int tipo = dis.readInt();
+		ExpresionInterpretada ret = new ExpresionInterpretada("");
+		ret.setListaOperaciones(ListaOperaciones.load(dis));
 		return ret;
 	}
 	public void save(OutputStream os) throws IOException{
@@ -89,9 +84,7 @@ public class ExpresionInterpretada{
 			for (int i = 0; i < args.length; i++) {
 				daos.writeUTF(args[i]);
 			}
-			daos.close();
 		}else{
-			daos.close();
 			operaciones.save(os);
 		}
 	}
