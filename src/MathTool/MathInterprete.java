@@ -111,18 +111,6 @@ public class MathInterprete {
 						split = spliterEspecial(txt, new char[]{'+','-'});
 						if(split.length == 1){
 							lvl++;
-						}else if(split.length == 2){
-							if(split[0].equals("-")){
-								Operacion op = new Operacion(new Operando[]{new Operando("-1"),new Operando(split[1])},Operador.MULTIPLICACION);
-								op.setId(ops.insert(op));
-								return op;
-							}else if(split[0].equals("+")){
-								Operacion op = new Operacion(new Operando[]{new Operando(split[1])},Operador.EVALUACION);
-								op.setId(ops.insert(op));
-								return op;
-							}else{
-								throw new InterpreteException("Not valid sumando");
-							}
 						}else{
 							System.out.println("Sumando");
 							Operacion op = null;
@@ -132,28 +120,61 @@ public class MathInterprete {
 							boolean encontrado = false;
 							for (int i = 0; i < split.length && !encontrado; i++) {
 								if(split[i].equals("+")){
-									encontrado = true;
-									for (int j = i+1; j < split.length; j++) {
-										op2 = op2 + split[j];
+									if(i == 0){
+										
+									}else{
+										encontrado = true;
+										for (int j = i+1; j < split.length; j++) {
+											op2 = op2 + split[j];
+										}
 									}
 								}else if(split[i].equals("-")){
-									encontrado = true;
-									for (int j = i+1; j < split.length; j++) {
-										op2 = op2 + split[j];
+									if(i == 0){
+										for (int j = i+2; j < split.length; j++) {
+											op2 = op2 + split[j];
+										}
+										Operacion opAux = new Operacion(new Operando[]{
+												new Operando(new ValorNumerico(-1)),
+												new Operando(spliter(split[i+1]).length > 1 ||hasMoreLevels(split[i+1]) ||validVariableName(split[i+1])  ? getOperacion(split[i+1], ops) : split[i+1])
+										},Operador.MULTIPLICACION);
+										opAux.setId(ops.insert(opAux));
+										if(op2.equals("")){
+											return opAux;
+										}
+										op = new Operacion(new Operando[]{
+												new Operando(opAux),
+												new Operando(spliter(op2).length > 1 || hasMoreLevels(op2) ||validVariableName(op2)  ? getOperacion(op2, ops) : op2)
+										},Operador.SUMA);
+										op.setId(ops.insert(op));
+										return op;
+									}else{
+										op2 = "-" + op2;
+										encontrado = true;
+										for (int j = i+1; j < split.length; j++) {
+											op2 = op2 + split[j];
+										}
 									}
-									suma = Operador.RESTA;
+									suma = Operador.SUMA;
 								}else{
 									op1 = op1 + split[i];
 								}
 							}
 							System.out.println(op1 + " .... " + op2);
 							System.out.println(spliter(op1).length);
+							if(op2.equals("")){
+								op = new Operacion(new Operando[]{
+										new Operando(spliter(op1).length > 1 || hasMoreLevels(op1) ||validVariableName(op1)  ? getOperacion(op1, ops) : op1)
+								},Operador.EVALUACION);
+								op.setId(ops.insert(op));
+								return op;
+							}
 							op = new Operacion(new Operando[]{
 									new Operando(spliter(op1).length > 1 || hasMoreLevels(op1) ||validVariableName(op1)  ? getOperacion(op1, ops) : op1),
 									new Operando(spliter(op2).length > 1 || hasMoreLevels(op2) ||validVariableName(op2)  ? getOperacion(op2, ops) : op2)
 							},suma);
 							op.setId(ops.insert(op));
 							return op;
+							
 						}
 					}else if(lvl == 1){
 						split = spliterEspecial(txt, new char[]{'*','/'});

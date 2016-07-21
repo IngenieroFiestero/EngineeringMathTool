@@ -45,7 +45,7 @@ public class Test {
 			eiAux2 = mi.evaluarExpresion("inte = matrixIntegration([1,2,3,2],[0.1,0.2,0.3,0.4])");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 			System.out.println("----------------------------------");
-			eiAux2 = mi.evaluarExpresion("a=-1");
+			eiAux2 = mi.evaluarExpresion("a=+1-2+3");
 			System.out.println(mi.interpretarExpresion(eiAux2));
 		} catch (InterpreteException e) {
 			// TODO Auto-generated catch block
