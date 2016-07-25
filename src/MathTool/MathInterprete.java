@@ -54,12 +54,18 @@ public class MathInterprete {
 	public MathInterprete(ContextoMatematico contexto) {
 		this.contexto = contexto;
 	}
-	
+
+	/**
+	 * Convierte una linea de codigo en una expresion interpretada
+	 * @param txt
+	 * @return
+	 */
 	public ExpresionInterpretada evaluarExpresion(String txt) throws InterpreteException{
 		ExpresionInterpretada ret = new ExpresionInterpretada(txt);
 		ListaOperaciones ops = new ListaOperaciones();
 		getOperacion(txt,ops);
 		ret.setListaOperaciones(ops);
+		ret.setTipo(findTipo(txt));
 		return ret;
 	}
 	/**
@@ -425,29 +431,6 @@ public class MathInterprete {
 			}
 		}
 		return args.toArray(new String[args.size()]);
-	}
-	/**
-	 * Convierte una linea de codigo en una expresion interpretada
-	 * @param txt
-	 * @return
-	 */
-	public ExpresionInterpretada compilar(String txt){
-		String[] split = spliter(txt);
-		ListaOperaciones lo = new ListaOperaciones();
-		ExpresionInterpretada ei = new ExpresionInterpretada(txt);
-		ei.setListaOperaciones(lo);
-		int tipo = setTipo(txt);
-		switch (tipo) {
-		case FINAL:
-			break;
-		case FUNCION:
-			break;
-		case INICIO_BUCLE:
-			break;
-		default:
-			break;
-		}
-		return ei;
 	}
 	/**
 	 * Aqui esta toda la miga del pan, analiza la operacion y en funcion del tipo y los parametros que posea la ejecuta
@@ -869,7 +852,7 @@ public class MathInterprete {
 	/**
 	 * Analiza internamente la linea para obtener el tipo
 	 */
-	private int setTipo(String linea){
+	private static int findTipo(String linea){
 		int tipo = -1;
 		String[] split = spliter(linea);//Posible optimizacion ya que no hace falta hacer un split completo
 		if(split[0].equals("function")){
@@ -900,6 +883,8 @@ public class MathInterprete {
 			}else if(split[0].equals("end") && split.length == 1){
 				tipo = FINAL;
 				//baja un nivel (end)
+			}else{
+				tipo = EVALUACION;
 			}
 		}
 		return tipo;

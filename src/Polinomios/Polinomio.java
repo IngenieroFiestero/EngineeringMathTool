@@ -17,7 +17,6 @@ public class Polinomio {
 		if(mat.dimensions()[0] != 1){
 			throw new MatrizException("Not valid dimension");
 		}
-		System.out.println(mat);
 		this.polinomio = mat;
 	}
 	public Matriz getPolinomio(){
@@ -72,7 +71,6 @@ public class Polinomio {
 		return new Polinomio(ret);
 	}
 	public ValorNumerico eval(ValorNumerico val) throws ValorNumericoException{
-		System.out.println("Val: " + val);
 		ValorNumerico ret = ValorNumerico.ZERO;
 		for (int i = 0; i < polinomio.dimensions()[1]; i++) {
 			ret = ret.add(polinomio.get(new int[]{0,i}).multiply(val.pow(new ValorNumerico(i))));

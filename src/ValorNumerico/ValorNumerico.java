@@ -61,16 +61,20 @@ public class ValorNumerico implements Cloneable, Serializable {
 				numb = numb + numero.charAt(i);
 			}else{
 				if(numero.charAt(i) == '+'){
-					suma = '+';
 					if(!findimag && i != 0 && !numb.equals("")){
 						real = suma + numb;
 						numb = "";
+						suma = '+';
+					}else{
+						suma = '+';
 					}
 				}else if(numero.charAt(i) == '-'){
-					suma = '-';
 					if(!findimag && i != 0 && !numb.equals("")){
 						real = suma + numb;
+						suma = '-';
 						numb = "";
+					}else{
+						suma = '-';
 					}
 				}else if(numero.charAt(i) == 'i'){
 					if(numb.equals("")){
@@ -574,7 +578,7 @@ public class ValorNumerico implements Cloneable, Serializable {
 		return new ValorNumerico(Math.log(real / denominador));
 	}
 	public ValorNumerico pow(ValorNumerico val) throws ValorNumericoException{
-		if (imaginario != 0) {
+		if (this.imaginario != 0) {
 			throw new ValorNumericoException(ValorNumericoException.generarNotSupported("^i"));
 		}
 		double mult = Math.pow(real/denominador, val.real);
